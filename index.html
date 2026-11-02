@@ -1,0 +1,2173 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#07080d">
+<title>一层一层 · 20 层</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  background:#05060a;
+  color:#e8e3d8;
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;overscroll-behavior:none;
+}
+#stage{
+  position:relative;
+  height:100dvh;width:100vw;
+  max-width:calc(100dvh * 9 / 16);
+  max-height:calc(100vw * 16 / 9);
+  overflow:hidden;
+  background:#0b0d14;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 90px rgba(0,0,0,.8);
+  touch-action:none;
+  user-select:none;
+}
+/* 比 9:16 更瘦长的手机屏：铺满全屏，不留上下黑边 */
+@media (max-aspect-ratio: 9 / 16){
+  #stage{max-width:none;max-height:none}
+}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+/* ---------- 通用屏幕层 ---------- */
+.screen{
+  position:absolute;inset:0;z-index:4;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top) + 20px) 26px calc(env(safe-area-inset-bottom) + 20px);
+  opacity:0;pointer-events:none;
+  transition:opacity .32s ease, transform .32s ease;
+  transform:scale(1.02);
+}
+.screen.show{opacity:1;pointer-events:auto;transform:scale(1)}
+.screen.panel{
+  background:radial-gradient(120% 80% at 50% 0%,rgba(28,31,44,.86),rgba(6,7,11,.94) 65%);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  z-index:6;
+}
+
+/* ---------- 标题页 ---------- */
+#title{
+  background:
+    radial-gradient(120% 70% at 50% -10%,#1b2030 0%,#0a0c13 55%,#06070b 100%);
+  justify-content:flex-start;
+  overflow:hidden;
+}
+.strata{
+  position:absolute;left:-6%;right:-6%;bottom:-4%;height:46%;
+  pointer-events:none;
+  opacity:.5;
+  mask-image:linear-gradient(to bottom,transparent 0%,#000 42%);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 42%);
+  transform:rotate(-2.2deg);
+}
+.strata i{display:block;width:100%;height:20%}
+.strata i:nth-child(1){background:#3d2f26}
+.strata i:nth-child(2){background:#57412f}
+.strata i:nth-child(3){background:#6d5236}
+.strata i:nth-child(4){background:#3f4653}
+.strata i:nth-child(5){background:#25293a}
+.strata i:nth-child(6){background:#151824}
+
+.title-wrap{position:relative;z-index:2;width:100%;max-width:420px;margin-top:11%;}
+.eyebrow{
+  font-size:11px;letter-spacing:.42em;color:rgba(240,179,76,.85);
+  text-transform:uppercase;display:flex;align-items:center;gap:10px;
+}
+.eyebrow:before{content:"";width:26px;height:1px;background:rgba(240,179,76,.55)}
+h1{
+  margin:14px 0 0;font-weight:300;font-size:clamp(46px,15vw,66px);
+  letter-spacing:.16em;line-height:1.1;
+  background:linear-gradient(170deg,#fff6e6 10%,#f0c88a 55%,#c08a4a 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 6px 24px rgba(240,179,76,.18));
+}
+.title-sub{
+  margin-top:16px;font-size:13px;line-height:1.9;color:rgba(232,227,216,.52);
+  letter-spacing:.06em;max-width:290px;
+}
+.title-sub b{color:rgba(232,227,216,.8);font-weight:500}
+.title-line{height:1px;background:linear-gradient(to right,rgba(255,255,255,.16),transparent);margin:26px 0 0}
+/* 中段的岩层剖面：直观地展示“越深越费体力” */
+.core{position:relative;z-index:2;width:100%;max-width:420px;margin-top:auto;opacity:.92}
+.core-cap{font-size:10px;letter-spacing:.24em;color:rgba(232,227,216,.32);margin:0 0 12px}
+.core-row{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.core-row i{
+  flex:none;height:10px;border-radius:2px;background:var(--c);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 3px rgba(0,0,0,.45);
+}
+.core-row em{
+  font-style:normal;font-size:9px;letter-spacing:.14em;width:38px;text-align:right;
+  color:rgba(232,227,216,.38);
+}
+.btns{position:relative;z-index:2;width:100%;max-width:420px;margin-top:auto;padding-bottom:6%;display:flex;flex-direction:column;gap:12px}
+.btn{
+  border:0;cursor:pointer;font-family:inherit;
+  height:54px;border-radius:14px;font-size:15px;letter-spacing:.14em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .12s ease,background .2s,border-color .2s,opacity .2s;
+  color:#efe9dc;background:rgba(255,255,255,.05);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);
+  position:relative;overflow:hidden;
+}
+.btn:active{transform:scale(.975)}
+.btn.primary{
+  color:#221703;font-weight:600;letter-spacing:.2em;
+  background:linear-gradient(180deg,#ffd08a,#ecab45);
+  box-shadow:0 10px 26px rgba(236,171,69,.22),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.btn.ghost{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.btn.tut{
+  height:46px;font-size:13px;letter-spacing:.16em;
+  color:rgba(240,235,225,.82);
+  box-shadow:inset 0 0 0 1px rgba(255,205,140,.2);
+}
+.btn.danger{color:#ff9b8a;box-shadow:inset 0 0 0 1px rgba(255,120,100,.3)}
+.btn:disabled{opacity:.4;cursor:default}
+.progress-hint{
+  font-size:11px;letter-spacing:.2em;color:rgba(232,227,216,.38);
+  text-align:center;margin-bottom:2px;
+}
+.foot{
+  position:relative;z-index:2;font-size:10px;letter-spacing:.22em;
+  color:rgba(232,227,216,.28);margin-top:18px;text-align:center;width:100%;
+}
+.dust{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.dust i{
+  position:absolute;width:2px;height:2px;border-radius:50%;
+  background:rgba(255,214,150,.42);
+  animation:float linear infinite;
+}
+@keyframes float{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  15%{opacity:.9}
+  100%{transform:translateY(-90px) translateX(14px);opacity:0}
+}
+
+/* ---------- 面板内容 ---------- */
+.panel-box{
+  width:100%;max-width:380px;
+  background:linear-gradient(180deg,rgba(24,27,38,.96),rgba(13,15,22,.98));
+  border-radius:20px;padding:26px 22px 22px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),0 24px 60px rgba(0,0,0,.6);
+}
+.panel-box h2{
+  margin:0 0 4px;font-weight:400;font-size:23px;letter-spacing:.14em;color:#f6efe2;
+}
+.panel-box .desc{font-size:12px;line-height:1.85;color:rgba(232,227,216,.5);margin-top:6px;letter-spacing:.04em}
+.row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 2px;border-bottom:1px solid rgba(255,255,255,.07);
+}
+.row:last-of-type{border-bottom:0}
+.row .lab{font-size:14px;letter-spacing:.08em;color:rgba(240,235,225,.9)}
+.row .lab i{display:block;font-size:11px;font-style:normal;color:rgba(232,227,216,.38);margin-top:4px;letter-spacing:.04em}
+.switch{
+  width:50px;height:28px;border-radius:99px;border:0;cursor:pointer;position:relative;
+  background:rgba(255,255,255,.11);transition:background .22s;flex:0 0 auto;
+}
+.switch:after{
+  content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
+  background:#d9d3c6;transition:transform .22s cubic-bezier(.3,1.4,.5,1),background .22s;
+}
+.switch[aria-checked="true"]{background:rgba(236,171,69,.9)}
+.switch[aria-checked="true"]:after{transform:translateX(22px);background:#fff4e0}
+/* ---------- 音量滑块 ---------- */
+.row.vol .volwrap{
+  display:flex;align-items:center;gap:9px;
+  flex:0 0 auto;width:47%;min-width:0;margin-left:12px;
+  transition:opacity .22s;
+}
+.volwrap.off{opacity:.38}
+.volwrap input[type="range"]{
+  -webkit-appearance:none;appearance:none;flex:1 1 auto;min-width:0;
+  height:24px;margin:0;background:transparent;cursor:pointer;
+}
+.volwrap input[type="range"]::-webkit-slider-runnable-track{
+  height:4px;border-radius:99px;
+  background:linear-gradient(90deg,rgba(236,171,69,.92) 0 var(--p,50%),rgba(255,255,255,.16) var(--p,50%) 100%);
+}
+.volwrap input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;border:0;
+  background:#f6e6c6;box-shadow:0 0 0 3px rgba(236,171,69,.2),0 2px 6px rgba(0,0,0,.55);
+}
+.volwrap input[type="range"]::-moz-range-track{
+  height:4px;border-radius:99px;
+  background:linear-gradient(90deg,rgba(236,171,69,.92) 0 var(--p,50%),rgba(255,255,255,.16) var(--p,50%) 100%);
+}
+.volwrap input[type="range"]::-moz-range-thumb{
+  width:16px;height:16px;border:0;border-radius:50%;
+  background:#f6e6c6;box-shadow:0 0 0 3px rgba(236,171,69,.2),0 2px 6px rgba(0,0,0,.55);
+}
+.volwrap .pct{
+  flex:0 0 auto;min-width:32px;text-align:right;font-size:11px;
+  color:rgba(240,235,225,.6);letter-spacing:.04em;font-variant-numeric:tabular-nums;
+}
+.panel-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.actions-row{display:flex;gap:10px}
+.actions-row .btn{flex:1}
+
+/* ---------- 选关 ---------- */
+.panel-box.wide{max-width:400px}
+.lv-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  margin:18px 0 2px;padding:2px;
+  max-height:min(48vh,340px);overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.lv-grid::-webkit-scrollbar{width:0}
+.lv-card{
+  position:relative;border:0;cursor:pointer;font-family:inherit;
+  height:58px;border-radius:12px;padding:4px 3px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:#e8e3d8;background:rgba(255,255,255,.05);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);
+  transition:transform .12s,background .2s,box-shadow .2s,opacity .2s;
+}
+.lv-card:active{transform:scale(.95)}
+.lv-card b{font-size:17px;font-weight:500;line-height:1;letter-spacing:.02em}
+.lv-card span{
+  font-size:9px;line-height:1.2;letter-spacing:.04em;max-width:100%;
+  color:rgba(232,227,216,.44);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.lv-card.cleared{
+  color:#f6d9a6;background:rgba(236,171,69,.12);
+  box-shadow:inset 0 0 0 1px rgba(240,179,76,.32);
+}
+.lv-card.cleared span{color:rgba(240,200,138,.55)}
+.lv-card.cleared:after{
+  content:"✓";position:absolute;top:5px;right:6px;
+  font-size:9px;line-height:1;color:rgba(240,179,76,.9);
+}
+.lv-card.current{
+  color:#2a1c05;font-weight:600;
+  background:linear-gradient(180deg,#ffd78f,#e6a441);
+  box-shadow:0 6px 18px rgba(236,171,69,.22),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.lv-card.current span{color:rgba(42,28,5,.6)}
+.lv-card.locked{opacity:.3;cursor:default}
+.lv-card.locked:after{
+  content:"🔒";position:absolute;top:4px;right:5px;
+  font-size:9px;line-height:1;
+}
+.stats{
+  display:flex;gap:10px;margin-top:16px;
+}
+.stat{
+  flex:1;border-radius:12px;padding:12px 10px;text-align:center;
+  background:rgba(255,255,255,.045);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+}
+.stat b{display:block;font-size:21px;font-weight:500;color:#f0c88a;letter-spacing:.04em}
+.stat span{font-size:10px;letter-spacing:.16em;color:rgba(232,227,216,.42)}
+.toast{
+  position:absolute;left:50%;bottom:calc(15% + 34px);transform:translate(-50%,8px);
+  padding:9px 16px;border-radius:99px;font-size:12px;letter-spacing:.1em;
+  background:rgba(10,11,16,.82);color:#f2ece0;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:7;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- 局内小按钮 ---------- */
+.hud-btns{
+  position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;
+  display:flex;justify-content:space-between;z-index:3;opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.hud-btns.show{opacity:1;pointer-events:auto}
+.icon-btn{
+  width:40px;height:40px;border-radius:12px;border:0;cursor:pointer;
+  background:rgba(255,255,255,.06);color:rgba(240,235,225,.8);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);
+  font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;
+  font-family:inherit;backdrop-filter:blur(4px);
+  transition:transform .12s,background .2s;
+}
+.icon-btn:active{transform:scale(.92);background:rgba(255,255,255,.12)}
+
+@media (max-height:620px){
+  h1{font-size:44px}
+  .title-sub{font-size:12px}
+  .btn{height:48px}
+  .core{display:none}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="cv"></canvas>
+
+  <div class="hud-btns" id="hudBtns">
+    <button class="icon-btn" id="btnBack" aria-label="返回标题">‹</button>
+    <button class="icon-btn" id="btnRetry" aria-label="重来">↻</button>
+  </div>
+
+  <div class="screen show" id="title">
+    <div class="strata" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="dust" id="dust" aria-hidden="true"></div>
+    <div class="title-wrap">
+      <div class="eyebrow">DIG · 20 层</div>
+      <h1>一层一层</h1>
+      <div class="title-sub">某处矿场突然冒出大量宝石，<b>挖矿潮</b>随之而起。<br>你只身赶赴矿脉：<b>满载而归</b>，还是<b>殒命于此</b>？<br>结局，都由你一步一步挖出来。</div>
+      <div class="title-line"></div>
+    </div>
+    <div class="core" aria-hidden="true">
+      <div class="core-cap">越往下 · 越费体力</div>
+      <div class="core-row"><i style="--c:#6b513c;width:100%"></i><em>●</em></div>
+      <div class="core-row"><i style="--c:#93693f;width:91%"></i><em>●</em></div>
+      <div class="core-row"><i style="--c:#bb9469;width:97%"></i><em>●</em></div>
+      <div class="core-row"><i style="--c:#5a6472;width:86%"></i><em>●●</em></div>
+      <div class="core-row"><i style="--c:#3a4256;width:78%"></i><em>●●●</em></div>
+    </div>
+    <div class="btns">
+      <div class="progress-hint" id="progressHint">进度 · 第 1 层</div>
+      <button class="btn primary" id="btnStart">开始游戏</button>
+      <button class="btn ghost tut" id="btnTutorial">教学</button>
+      <button class="btn ghost" id="btnSettings">设置</button>
+      <button class="btn ghost" id="btnExit">退出游戏</button>
+    </div>
+    <div class="foot">键盘 WASD ／ 手机点按 · 教学 + 20 层</div>
+  </div>
+
+  <div class="screen panel" id="levelsPanel">
+    <div class="panel-box wide">
+      <div class="eyebrow">SELECT · 关卡</div>
+      <h2>选择关卡</h2>
+      <div class="desc" id="lvDesc">已通关 0 / 20</div>
+      <div class="lv-grid" id="levelGrid"></div>
+      <div class="panel-actions">
+        <button class="btn ghost" id="btnLevelsBack">返回标题</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen panel" id="settingsPanel">
+    <div class="panel-box">
+      <h2>设置</h2>
+      <div class="desc">全部选项都会保存在这台设备上。</div>
+      <div class="row">
+        <div class="lab">音效<i>挖掘与拾取的声音</i></div>
+        <button class="switch" id="swSfx" role="switch" aria-checked="true"></button>
+      </div>
+      <div class="row vol">
+        <div class="lab">音量<i>拖动调整整体音量</i></div>
+        <div class="volwrap" id="volWrap">
+          <input id="volSfx" type="range" min="0" max="100" step="5" value="50" aria-label="音效音量">
+          <span class="pct" id="volPct">50%</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">减少动效<i>画面更安静一些</i></div>
+        <button class="switch" id="swReduce" role="switch" aria-checked="false"></button>
+      </div>
+      <div class="panel-actions">
+        <button class="btn ghost" id="btnReset">清除进度</button>
+        <button class="btn primary" id="btnSettingsBack">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen panel" id="exitPanel">
+    <div class="panel-box">
+      <h2>退出游戏</h2>
+      <div class="desc">进度已经保存。下次回来，从当前这一层继续。</div>
+      <div class="panel-actions">
+        <button class="btn danger" id="btnExitYes">确定退出</button>
+        <button class="btn ghost" id="btnExitNo">再挖一会儿</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen panel" id="resultPanel">
+    <div class="panel-box">
+      <div class="eyebrow" id="rsEyebrow">第一层</div>
+      <h2 id="rsTitle">挖到了</h2>
+      <div class="desc" id="rsDesc"></div>
+      <div class="stats" id="rsStats">
+        <div class="stat"><b id="rsLeft">0</b><span>剩余体力</span></div>
+        <div class="stat"><b id="rsDig">0</b><span>移动步数</span></div>
+        <div class="stat"><b id="rsBest">0</b><span>最少体力</span></div>
+      </div>
+      <div class="panel-actions">
+        <button class="btn primary" id="rsNext">下一层</button>
+        <div class="actions-row">
+          <button class="btn ghost" id="rsRetry">重玩本层</button>
+          <button class="btn ghost" id="rsHome">回到首页</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+<script>
+(function(){
+'use strict';
+
+/* ==================== 工具 ==================== */
+const $ = s => document.querySelector(s);
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const lerp=(a,b,t)=>a+(b-a)*t;
+const easeOut=t=>1-(1-t)*(1-t)*(1-t);
+const easeInOut=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const R=(n)=>Math.round(n);
+/* 体力可能出现 0.5，整数时不带小数 */
+const fmtE=v=>Math.abs(v-Math.round(v))<1e-9?String(Math.round(v)):v.toFixed(1);
+
+function hash(a,b){
+  let n=(a*73856093)^(b*19349663);
+  n=(n^(n>>13))*1274126177;
+  return ((n^(n>>16))>>>0)/4294967296;
+}
+const hex2rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const rgba=(c,a)=>'rgba('+R(c[0])+','+R(c[1])+','+R(c[2])+','+a+')';
+const mixC=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)];
+const shade=(c,k)=>[clamp(c[0]*k,0,255),clamp(c[1]*k,0,255),clamp(c[2]*k,0,255)];
+
+/* ==================== 音效（合成音 + 一次实测敲击取样） ==================== */
+/* 挖掘音取自「石头敲击」视频里的一次真实敲击：裁成 0.62s、单声道 32kHz、尾部淡出，base64 内嵌 */
+const DIGB64='UklGRnSbAABXQVZFZm10IBAAAAABAAEAAH0AAAD6AAACABAATElTVEgAAABJTkZPSUNNVCUAAAB2aWQ6djAyNjljZzEwMDA0ZGJqbDVpcTdkbGRkOGI4MTVncGcAAElTRlQOAAAATGF2ZjU3LjI1LjEwMABkYXRhAJsAAMsAygDDAL0AqgCUAJYAmQCKAHwAdgB0AHsAbQBoAG0AdAB4AHsAfgBuAHYAbABiAE8AUgBqAG8AfQB/AHUAcQBsAG8AbABlAFsATwBbAEYAOwA9ACoAFwAYAAoAEAAMAAAABAD9/////f/8//T/+P/8/9n/2P/e/8f/yf+3/6n/of+h/5P/mv+n/5D/ef9//3n/df+D/4f/lP+t/8T/q/+g/67/xv/T/8z/yv/f/+f/4v/k//f/8v/r/////f/v/9j/3P/n/9f/zP/d//j/AgAMAA4ABQACAPb/EgAAAP//+P/S/+L/3P/h/9z/yf/G/73/yv/R/8r/zP/Z//f/7v/u//v//f8NABAADgAaAPr/6//i/9b/zP++/8T/w//E/7P/p/+l/7T/zf/a/+T/8v/0/wAAEQAZACMANAApACgAIQAfACoAMABAADsATgByAIQAgwCIAIEAhgCEAIMAegBcAD4AMwAmACMAHAD7/+P/5v/p/9v/x/+S/4X/hf+Y/6r/m/+T/43/cf98/5L/nv+s/6H/ov+t/7j/tf+z/87/yv/F/9//2f/Q/7f/vP++/5z/h/9v/2X/dP95/3r/hP+J/5j/pf+4/9L/zP/T/9P/1v/U/9L/y/+1/7T/ov+h/5f/gv94/2//Z/9U/z//Of8g/xH/Gv8K//r+4f7R/tj+2f7M/sz+1f7f/vP+Af8L//z+/P4G/xb/Kv8n/y3/Jv81/1n/ZP9U/1T/Vf9O/2n/dP9x/3L/ef97/3//fP92/23/av9x/2v/nf+7/8P/4P/c/+f/6P///wsACgAXABAAFwAVABMAEAD+//z///8JACEAIwA+ADYALwBRAEIAMwA0ADAAKgAaAAgA/////+z/6f/x/9D/1P/F/7j/u//B/8r/1v/W/83/1//O/+H/+P8fADoASQBOAGIAfgB3AHEAcwBsAHYAfgCDAHcAbwCHAIYAhQBuAGoAZgBpAHYAVgBGADgAHgAKAAkAGAATAA8AAgAHAAAA8v8KACoAIwAgADwAPwBcAGsAbgB8AG0AhACbAK4AqgCGAJYAkQCAAGgAagBgAFsAhgByAGQAYQBgAHgAYwBXAFsAVQBSAEMAQgBCAFkAdgB5AH4AgwCDAI4AqgC4AMsA2ADLAOcA3wDVAN8A7QD2AOYA4QDNANsA1AC8AJkAjQCPAI4AjwB+AIAAfAB/AIcAewBxAHUAcQBzAHYAdQBoAEUAMgAsADgATABTAGsAeAB9AI8AowCqAJ4AnAChALEApQCYAKAAmACZAKgAnwCaAJ8AoACfAJsAlwB3AHEAbABUAGUAZwBrAIMAdwCHAJMAkgClAKoAwQC5AKUAlwCNAJQAhACJAHEAWwBdAD0AOQAmAP7/8f/i/+H/6//Y/7v/sv/D/7n/uf+7/63/uv+8/6r/nv+b/6L/nP9//2z/YP9G/0X/Rf86/z7/Mf87/yj/G/88/zv/Ov80/zb/T/9Z/3r/nv+0/9b/3P/f/wEAGQArAEIANwA5ADYALQAsADwASgBKADsAKwBBAEsAUQA5ABgABQAGACIALgAXAPz/9v/1/+3/5f/K/8j/2P/K/8D/xf/J/9L/6v8gADQAPwBqAHkAiwCfAK4AnwCbAIkAcwB0AFYAZgBpAFYAVwA7AE4ASwA+AEsARQBIAC4AIwANAPX/4f/R/9n/2f/d/+L/0P/X/9j/z/+9/7b/uP+q/7L/n/+T/5X/iv94/3f/bP9n/3T/cf9m/2j/dP9q/2n/ef9w/4P/kP+U/53/o/+z/7D/xP/Z/9n/y//X/+//7v/8/xYAGAAnADEAHAAqADUAQwBRADIAJwAfACQALwAaAAwA+//x/+//4v/y/97/y//S/7X/sv/C/7//wf+8/5P/f/96/4b/iv+V/6P/r/+g/5z/xP/B/9j/5f/y////9v8CAAMAGgATAAwA/v/1/+r/2P/p/9j/zP/P/9v/4P/j/9r/1P/K/8T/yv/N/7n/qf+j/4f/eP9n/2f/eP95/3L/dv+C/3v/d/+M/5P/of+r/8j/1//M/+D/7f/9/xQACgD5/9T/vv+//7n/y//e/9n/3//k/8v/4f/7/wgAHgA3AFkAcwCWAK8AtgDIANgA0wDJAMkAvwDTANIA1ADpAPQA9gDxAOUA7QADAeIAzQC+ALEAsAC9ANAAxwCvAMMAtACSAI8AkQCYAJsAkgCWAKIAngCUAIUAiwCSAIYAgACWAKAAlAB7AJQAjwChAK0AogC5AKwArgCqAL0AwQDRANcAxQC4ALgAuQCUAKUApwCWAIUAbwBxAFAAUQBUAFMAWQBVAGEAdgCDAIUAngCUAIwAkQCEAH8AiwCUAIMAdgBsAFkAcQBqAGAAYwBNAGsAcQBuAF4ASwBTAF0AWABdAG4AXQBiAF0AVgBZAGgAeQCHAJcAhwB5AH0AhQCAAHwAdABVAEEAUQBSADoAKwALAAEABQAAABUABgD8/xIABAAHAB8AEgAyAEAANQBGAEYAVABcAHAAZwBbAG4AdgB5AFIAQQBDACcAJwA4ADIAIgAqAA0AHwAvAEYAbABkAHsAbABqAIoAtAC4AL8AvQCvAKEAhgCXAJwAjQB8AGcAXwBdAFoAWgBXADoANwA5ACcAGgAEAOP/v/+//8P/zf/O/8D/uv+3/6v/rP+8/6v/pf+v/6r/y//k/+f/CgANABUARQBOAEMAQgBCAEsATQBUAEoARwBDADkAKAAbACQAIQA8AEAANgA+ADIAOQBdAGYAXQBcAGcAZgBpAFoAUABjAF8AUABWAHAAZABqAIgAjQCZAJgAgwBvAHsAfgB1AGwAZQBeAFgAXwBoAHIAYQA6ADsALAAcAC4ACgAFAPD/6v/1/+z/4P/Q/9b/wP+4/73/0//k/9z/5P/7/w8AHwAtADgALQA4AFAAXwBtAHYAdQB2AHcAcwCVAJgAlgDAAM0A3wDtANwA3wDgAOwAEwEeASkBNgE6AT4BLQE8AUIBJwERAQwBGQEOAfQA5ADKAM4AvgCxAJAAfQCQAIsAlwCcAJ4AkgCjAKEAogCpAJUApACiAJQAogCSAI0AjQCZAKUAjAB3AGcAcgBtAFoAQQA0AE4AagB5AI8AiQCcAL4AugC6ALkAzADeAOsACwEQARABEgEVARQB/QDvAOkAyACxAKcAngCaAKEAmgB+AH8AfQB2AIoAsQCtAMQAzADPAOIA2ADfAOQA4gDZANMAyADCAMwA2QDKALwAxwDIAMcAxQC1AK4AuADJANYA3wDbAOAA4gDrABYBMwE2AVMBWAFfAWQBWgFkAVsBWgFTATMBLgFOAVgBWwFGAToBOwFJATUBIwE2ASkBIAEdAS0BHAEJARIB9wDgANoA3wDLALUAmwCDAIcAewCHAGgAggCVAHwAnACJAI0AkgBzAG0AdQCFAIQAkACjAJAAeAB6AHoA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gv+y/4L/Lv8Y/y//aP+c/7D/mf9b/y7/Nv9//8r/3f+//5j/cf9h/3j/WP8+/zP/Lv9Y/2z/gv+g/73/zv/D/5b/Z/9Y/0b/Tv9h/3v/df9g/0j/SP9q/57/ov9z/zH/Cv/8/v/+M/85/0P/Jv/p/r/+wP7e/gj/HP8Q/wD/7/4d/2z/r//d/87/sv+s/8L/EABWAEkAFgDu/9f/+v84AFgAfACSAGQAMQASADwAWABdAE0A/P+9/8T/FgBUAEgACwDA/5b/kP+h/8z/6f/q/+D/m/96/5X/o/+8/67/of+Z/4j/lf+e/6z/xf+p/4n/dP+L/6H/pf+4/6v/pv+m/6D/rf/B/+L/+P/O/6n/iv97/43/o/+t/5T/ZP9W/0n/MP9C/23/X/86/yT/F/9B/3T/lf+o/6//rv+o/6D/tP/s//n/1v+r/4D/bP+O/7X/wf+w/47/gf9x/27/gP+T/6P/p/+D/2X/c/+Y/7T/u/+t/5H/gf+N/7D/0v/b/8f/mf+C/7D/8f8hAEYATwBEADQAKQAwAEUAUgA1ABoACgD3//H/AQAbACQABQDt/9z/0P/n/wEAAAC+/6H/l/+P/6T/uf/T/9X/zv+i/4r/k/+w/9f/z//X/9P/y//K/wMAHQAMAAEA0P+y/5b/nv+9/+T/6f/c/7r/mf+5/8T/2f/o/87/ov98/4v/o//V/+P/tP98/1b/dP+i/6f/sf+j/3f/V/9w/4//j/+s/5X/m/+n/6z/z//r/w0AFAABAOD/7f8XAFgAegBnAFYAMQAzAE4AbQCQAHYAOQAMAAEAIgBbAIwApACCAFQAVgBuAMMA/AAWAQgBvgCbAJUAzgD0AAAB/wD2AM8A0QAFAScBNgExAREB1ADKAOMAAgH0AMwAqQCcAJwAwQDPAMgAoABZAC4APQB5AKUAyQDRAL8AvACvAKMAtACkAJkAegBsAHkAiACXAKEAnwCJAHkAZwBkAFwAWQBxAJkAuQDWAOQA9wDzAOEA+gAPAQgB/wD0ANkAuAChAJoAtgDLAKgAmgC2ALoArwCYAIoAZABEAFsAewCzAM0AxACUAH8AggCBAM0A8gDYAKoAcQBwAKkA3gD9AN0AfgBTAHQAvADsANwAnwBUABwAEgAyAHIAdwBcADYAMQB4AL4A+QD8AMoAZgAaACwAkADaANwArwBbAB0AMQBbAH4AgQBcACIABAAqAFkAogChAIMAZwBDAFgAfQBrAFIAQQAxAGYArADaAAEB9wDnAMMAiwBwAEMASABKAD0AMABCAIYAowCXAIMAPQAOACYAIwAEAPv/+P/e/93/DgA8AD0AOgBPAC8ADQAnAC0AHgAZACAATwB0AK4A4wDMAMcApQCSALMAxwC8AI8AVwA4AF4AfwCkAKUAgABuAGsAjQDGANoAoQBbAA0A9P8CACEAVgB4AHUARABGAFMAZgBQABoA4P/E/+n/KQBGADwAUAAiAOr/5P/j//z/FgD7/8T/vv/y/xIAKgAoAAEA8//x//3/FQAnABkA+v8AAAsAJgBRAGkAZgBJADsARQBSAFUARQBFAE8AOABbAIEAoACsAJkAmgCLAGkAVQBVAFkAdgCDAIQAjwCNAI8ApACfAHEAOABVAGQAYwBoAF4AhQCZALEAxgC3AJAAfgBwAH4AowC0AKIAdwB5AIAAlAChAKQAoACyAM0A2QDyAOoA6ADuAPwABgEbATMBKQEkAREBFQEkAS0BMAEmATEBTwE4AQ4BFgE/AVcBYwFnAUIBLQErAUQBWgFpAVABLgEdAR4BVgFbAVwBQgExAVMBYAFwAXwBUQEmASoBSgFnAZYBdgE/AUABIQEiAREBDAEZARIBDwEZAQAB3wDSANAAtwDJAOUA5ADdALYAuQCYAKgA1gDUAOEA/QALAfkA1wDLALoAsQDCAMgAqAC5AOEA2wDdAMkAywDSANIAtACfAKsAngB4AFgAbQCwAMoA1ADHALgAvwC4AJkAbgBxAE8ARgB1AIUAhACCAG0AWwBoAHQAUgAqABgAEwAiAB0ADwAtADQANwBcACwA7f+y/3z/o//e/+v/wv95/2n/cf+S/8P/nP+k/6n/cP9d/2f/ov+n/5z/k/+F/5P/nP+i/4z/df9g/1T/Z/+T/7D/pf+a/6H/mv+v/6H/mf+q/6P/qf+N/3n/cP9w/2r/cf9n/y7/Hf81/2T/if9//3b/V/82/13/mv+3/9z/5P/L/9r/4P/K/+f/5f/B/8f/zv/S/83/4//x/+P/2v/m/87/w//M/+b/BAD9//v/7P8EACEAMwBHAEIANQA1AEEAWgBeAFQARwBAADgARABeAHUAoACyAKIAfwBTADAAEgAWAEQAXwBdAEoANAA7AEIATwA0AA0A/v/k/wwALQBPAGsA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GP8W/xr/Gf8q/0T/Xf9x/47/gv9//4v/e/+W/3j/cv+L/5b/yv+a/2X/Xv9H/0r/d/+o/8j/yf+b/4P/ff92/2j/Zv+H/47/nP+e/7D/o/9t/2r/V/9H/0T/V/9A/zr/S/9d/4r/gf9t/2L/Xf9k/1j/SP9S/03/Kv8L/x//F/8m/1T/df+P/1D/Kf8B//L+Cf8U/yj/QP9o/1//Wf9C/2X/ef9Z/3//ef9z/4v/nv+5/7//4f/7//n/BAADAAUAIwBMAEkANgAaAOX/xP/F/7D/m/+u/6b/n/+z/47/cv91/43/i/+L/5H/dv+c/5T/kf98/33/m/+d/7f/sP+t/67/wP+3/6n/n/+1/7D/tP/P/9X/8v/5//T//v8ZABkAMAAtAD4AXABbAFwAXgBwAHQAWABOAFgAVgBnAFMANwAaACMAHQAtAFAAJgAeACgAFgALABAAFQD2/+X/8f8AABEA5P/K/8b/w/+2/7H/rv+r/8P/of95/3z/f/+L/4T/if+M/3z/lf+o/67/oP+F/3T/ev+D/53/mf+s/7//v//N/8D/u/+8/8D/uP/e/+P//P/9/9H/3P/Q/+f/EwAUAO//4//G/53/s/+q/43/lf+e/47/hP+E/3v/c/+C/2//TP88/0P/SP85/zj/EP8K/y7/L/9H/2P/Vv9e/2X/Wf9a/1n/Rf9S/zD/Nv+D/3H/bf9k/2r/oP+i/7X/0v+n/3f/cf9f/4P/ov9v/2b/i/+m/4v/dP9p/3//W/9F/3D/q//a/8j/nv+X/7D/x//6/wYADAC7/8b/AwAAANX/Uv8//6D/7P/T/3v/UP97/7z/0f/F/2n/F/9Q/53/1//N/6b/t/+j/4b/nv+X/8P////6/+7/4P/D/63/nf97/5//1v8HAA4AHgBUAHcAbAA7AEYAQQA9AEcAUgByAEQANQBRAHkApAB5AFoAeACSAJsAogCWAH8AYwBcAF4AXAB5AIgAcgBPAFUAMwAtAFYAfgCgAI4AnwCUAKcAugC2ANgACAE6ASYB+gDpAPkA5QDWAN4A1wDXAMQAuwCiAJIAgQCJAIoAdgCTAG8AcgCBAH0AYAAtAFAAYgBfAFUASgBiAGwAYgBoAHAAdQBnAFkARQBzALQAnwCQAHsALQAmAFkAOABIAFEAIwAWAAoAEgAgADwAIQAEABMADQAwAEIAKQAnABwA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nf90/5H/o//r/w4A6//g/8n//P/f//r/HQDx/6//nv+6/4T/mv/H/+z/DwBIAKoAdwBAACAAjP87/0v/a/92//7/UwBCAJcAhgBfAGkAUAACAM7/6P/d/wEAPgBkAFkAcACbAIcASAAMAPX/+f8UAAIA8f+0/6//PP8X/1IAHwERAQsB1AB+AOz/Qf/y/s/+Vf/U/8b/y/8gAJ0A5ADFAI8AMgCu/2L/Pv80/3D/wv87AKYA1AC1AGUAcAB+AD0AEAArABYAEwA4ACUAHQDv/+b/BQAGABMAAwACAP7///8TABsABgAcACIALQAlAAgAEgAOABkAEQARAAQA+P/q/+X/7P8GABcALQBRAEsALAAMABAAHwAxABkAAQAFAPv///8FAPb/1//n//L//f8PABMAMQAzACIAEQD7//z/EQAGAPb/7P/w//7/CwASABcAFQAZABQAEgAXABYAKgAsABkA9P/u//L/7P/t//n/BQAUABMACAAJAP//AADk/8b/zv/a/+v/AQD//wUADgAKAAoAAwD6/w4AIAAmACAADgAQAAYAEAAQAP//AQD4//P/EQArACUAMwAtAB8AHAAZAAcAAQADAP3/CQANABAABgAGAAAA9P/z//j/CAADAAAA/f///woABwAHAAAABAD8/wEAEAAHABIAFwAMAAIA///6//3/9f/s//P//f8WAA8A/P/3//7/AwAEAPv/6P/s/+z/8//t/+7/6v/U/9j/3f/k/wcACQASAAcA9f/8//X/DgANAP3//v/q/+v/CADw//v/BQAdABkAFQAoAA4AHQAmABcAEAAMAAQAAADv//3/CgADAA0AAwD8/wUAEQATABUAJgAQAA8AIAAnABMADAAVAA0ADgAXAB4AEwAbACEAFgAXACwAIgAYABUAEAAjAC8AIwAdABYAFwAUAA4AHwAWABMAEAADAPz/+P/2/wMABgALAAsACQApAB0AKgAnAB0AKQAfAB0ACgD//xMAFwAYABIAEwAiABcAIwAhACMANgAqAB8AGQARABoAGwAiABoADAAWABIAGwALAAIABgACAA8ACgD+/wQABAASAAsAAQALAAkAGQAQAAoAFQAfACwAIwAhADAAKgAwAC8AJwAlAB8AKQAeACAAJAATABMAAwD+/wgAAQAQABIAAwAGAP//BQATABAAEQAMAA8ACgAJAA0AAwALAAcACAARAA0AEgANAAIACgAMAAQABAD///z/+v8CAAYAAAAIAAMA/v/+/wUAEgAFAAoAAAD7/xIAEgAOAAUA/v8AAAgAEQARAAcA/P8BAAkABAADAA0AFQAkACcAFwAUABAAGgAlABoAEQAQAAwABQD4/+X/3P/W/8z/yP/C/6v/pP+q/6f/ov+U/47/k/+P/6D/qv+k/7v/w//a//v/CQAdACkANQBAAFsAYABWAFgAUABYAGgAZwBYAFAATABGAEgAMwAsACIAGwAhACMAKwAjAC8AKwAoACMAJAArAA0AEgARAAkAGwAOAP7//v8DAAsAEgAEAP7/DgALABIAEwAJABUAHAASAAMAAAD2/+//7f/y//D/3v/z/+n/0v/U/8P/y//Z/9//4//U/83/1f/q/9//z//W/+r/9v/h/97/3P/i/+//9P/7/wEAAwAJABcACAABABIAGgAaABkAHQAlABsADwANAAsAFQAKAAcAFwAXACEAFgASABkABwD9/xEAGwANAAUA/P/8/wsABQAKAAoA8/8DABYAEQD7//X/DQAWAAMA+f/5/w0AGAALAAAA9v/7/wIAAgDy/+r/8P/9//X/4f/j/+//9//z/+z/7//2//j//v////f/7f/8/xEAFQAWAAgA+v/5/xAAHwABAPb/BAAFAAQABAAAAPf/+P8BAA4ACQD4//X/CgATAP//9f/+/xMADwAEAAUA//8KAA0AAwACABEADwD///T/8v8AAAkACAABAPr/7v8HAAMA7v/f/9X//f8rADEACgD1/+D/y//C/7T/xv/C/5D/jv/U/xAAHQArADEAeACkAJEAbQBsAIUAdABYADcAMgAjAAsA8P/w//H/4f/L/6j/rP/o/xIADQDq/9v/8P8UABgA9v/p/+7//v8AAAYACgAFAPf/5f/i//L/8//c/9L/3P/2/xEAKAAiABkAGgAOAA8ADAAOAA0ACAAMAA0AFAASAAAA7//o/+T/4f/m/+z/6P/y///////9//////8FABEADgAMAAYAAwAIAA0ABwD6//v//f/8//v/+//0//X/+v/2//P//f8GAAUAAgD8/wAACAAEAAMABgD+/wMAAwD3//z/BgAFAAAA/f/5//H/8P/2//j/+//9/wEABgAGAAMABQAJAA4ADwAKAAcABQAJAAgAAwABAAIA/v/2//T/+f/9//v//P/6//z/AgD+//7///8AAAAAAQADAAIABQADAAEAAwAEAAUABgABAAEAAgABAAEAAAACAAQAAQABAP///f///wAA/v8AAP///v/+//7/AAD7/wAAAQD7//3//P/9/wEA//8BAPz/+f/+//f/+/8BAAUA/P/2//z//v8GAAcAAAD9////AAD+//z//f8AAAAA/v/8//3/AAAAAP///////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const DIG_GAIN=0.18;
+const Sfx={
+  ac:null,buf:null,enabled:true,out:null,vol:1.5,digBuf:null,digReq:false,
+  init(){
+    if(this.ac) return;
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC) return;
+      this.ac=new AC();
+      this.out=this.ac.createGain();
+      this.out.gain.value=this.vol;
+      this.out.connect(this.ac.destination);
+      const n=Math.floor(this.ac.sampleRate*0.22);
+      const b=this.ac.createBuffer(1,n,this.ac.sampleRate);
+      const d=b.getChannelData(0);
+      for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+      this.buf=b;
+      this.loadDig();
+    }catch(e){}
+  },
+  /* 解码内嵌的敲击取样（浏览器里异步，几毫秒） */
+  loadDig(){
+    if(this.digBuf||this.digReq||!this.ac||!DIGB64) return;
+    this.digReq=true;
+    try{
+      const s=atob(DIGB64), n=s.length, u=new Uint8Array(n);
+      for(let i=0;i<n;i++) u[i]=s.charCodeAt(i);
+      const p=this.ac.decodeAudioData(u.buffer,
+        b=>{ this.digBuf=b; },
+        ()=>{ this.digReq=false; });
+      if(p&&p.then) p.then(b=>{ this.digBuf=b; }).catch(()=>{ this.digReq=false; });
+    }catch(e){ this.digReq=false; }
+  },
+  playDig(hard){
+    if(!this.enabled||!this.ac||!this.digBuf) return false;
+    const c=this.ac;
+    const src=c.createBufferSource(), g=c.createGain();
+    src.buffer=this.digBuf;
+    /* 每次略微变调/变调性，重复敲击不会像同一段录音；硬地层更低沉 */
+    src.playbackRate.value=(hard?0.94:1.02)+(Math.random()-0.5)*0.05;
+    g.gain.value=DIG_GAIN*(0.94+Math.random()*0.12);
+    src.connect(g); g.connect(this.out||c.destination);
+    src.start(c.currentTime+0.001);
+    return true;
+  },
+  setVol(v){
+    this.vol=v;
+    if(this.out) this.out.gain.value=v;
+  },
+  resume(){
+    this.init();
+    if(this.ac&&this.ac.state==='suspended') this.ac.resume().catch(()=>{});
+  },
+  tone(f,dur,o){
+    if(!this.enabled||!this.ac) return;
+    o=o||{};
+    const c=this.ac, t=c.currentTime+(o.delay||0);
+    const osc=c.createOscillator(), g=c.createGain();
+    osc.type=o.type||'sine';
+    osc.frequency.setValueAtTime(f,t);
+    if(o.slideTo) osc.frequency.exponentialRampToValueAtTime(o.slideTo,t+dur*0.92);
+    const amp=o.gain==null?0.16:o.gain;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(amp,t+0.014);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    osc.connect(g);g.connect(this.out||c.destination);
+    osc.start(t);osc.stop(t+dur+0.03);
+  },
+  noise(dur,o){
+    if(!this.enabled||!this.ac||!this.buf) return;
+    o=o||{};
+    const c=this.ac, t=c.currentTime+(o.delay||0);
+    const src=c.createBufferSource(); src.buffer=this.buf;
+    const f=c.createBiquadFilter(); f.type='bandpass';
+    f.frequency.value=o.freq||700; f.Q.value=o.q||1.2;
+    const g=c.createGain();
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(o.gain==null?0.14:o.gain,t+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    src.connect(f);f.connect(g);g.connect(this.out||c.destination);
+    src.start(t);src.stop(t+dur+0.02);
+  },
+  dig(hard){
+    if(this.playDig(hard)) return;                 // 取样就绪时用它
+    this.noise(0.15,{freq:hard?430:780,q:1.1,gain:hard?0.16:0.13});
+    this.tone(hard?150:210,0.1,{type:'triangle',gain:0.1,slideTo:hard?90:150});
+  },
+  step(){ this.tone(320,0.05,{gain:0.045}); },
+  gem(){
+    this.tone(880,0.2,{gain:0.17,slideTo:1180});
+    this.tone(1560,0.3,{gain:0.1,delay:0.07});
+  },
+  win(){
+    [523,659,784,1047].forEach((f,i)=>this.tone(f,0.42,{gain:0.14,delay:i*0.095,type:'sine'}));
+  },
+  fail(){
+    this.tone(230,0.55,{gain:0.16,slideTo:105});
+    this.noise(0.4,{freq:220,q:0.7,gain:0.05});
+  },
+  ui(){ this.tone(560,0.07,{gain:0.07}); }
+};
+const vibrate=(ms)=>{ if(navigator.vibrate) try{navigator.vibrate(ms);}catch(e){} };
+
+/* ==================== 存档 ==================== */
+const PKEY='layerby1.';
+const DB={
+  get(k,d){ try{ const v=localStorage.getItem(PKEY+k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(PKEY+k,JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(PKEY+k); }catch(e){} }
+};
+const SETTINGS=Object.assign({sfx:true,reduce:false,vol:50},DB.get('settings',{}));
+/* 音量：0~100，映射到合成音的总增益（100 约等于原始音量的两倍） */
+const VOL_MAX=2;
+const volGain=v=>clamp(Number(v)||0,0,100)/100*VOL_MAX;
+if(!(Number(SETTINGS.vol)>=0&&Number(SETTINGS.vol)<=100)) SETTINGS.vol=50;
+Sfx.setVol(volGain(SETTINGS.vol));
+let PROGRESS=Object.assign({level:0,cleared:0,tut:false},DB.get('progress',{}));
+
+/* ==================== 地层与关卡 ==================== */
+const LAYERS={
+  soil:{name:'表层土',cost:1,base:'#4b382b',light:'#5e4837',dark:'#31241b'},
+  clay:{name:'黏土层',cost:1,base:'#7a5634',light:'#93693f',dark:'#573b21'},
+  sand:{name:'砂岩层',cost:1,base:'#a4805a',light:'#bb9469',dark:'#806149'},
+  stone:{name:'岩石层',cost:2,base:'#47505e',light:'#5a6472',dark:'#333a46'},
+  deep:{name:'深岩层',cost:3,base:'#333a4c',light:'#454c60',dark:'#1f2331'}
+};
+Object.keys(LAYERS).forEach(k=>{
+  const L=LAYERS[k];
+  L.rgb=hex2rgb(L.base); L.rgbL=hex2rgb(L.light); L.rgbD=hex2rgb(L.dark);
+});
+
+/* 关卡设计标准：按最优解通关后，剩余体力不足 5 点，并随层数递减。
+   1-5 层余 4，6-10 层余 3，11-15 层余 2，16-20 层余 1，再往后维持 1。
+   预算 = 最优代价 + 该层余量，所以「一路最优」正好剩下这个数。 */
+const REMAIN_BANDS=[[5,4],[10,3],[15,2],[20,1]];
+function remainTarget(n){
+  for(const [to,v] of REMAIN_BANDS) if(n<=to) return v;
+  return 1;
+}
+const LEVELS=[
+  {
+    /* 最优 12.5 → 预算 16.5（余 4） */
+    name:'第一层',place:'表土',
+    cols:7,rows:9,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:6,layer:'clay'},{from:7,to:8,layer:'sand'}],
+    start:[5,0],
+    gems:[[1,5],[2,7],[5,6]],
+    open:[]
+  },
+  {
+    /* 最优 13 → 预算 17（余 4） */
+    name:'第二层',place:'灰土',
+    cols:7,rows:9,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:5,layer:'clay'},{from:6,to:8,layer:'sand'}],
+    start:[3,0],
+    gems:[[1,2],[2,7],[5,5]],
+    open:[]
+  },
+  {
+    /* 最优 12.5 → 预算 16.5（余 4） */
+    name:'第三层',place:'黏土',
+    cols:7,rows:9,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:5,layer:'clay'},{from:6,to:8,layer:'sand'}],
+    start:[5,0],
+    gems:[[1,5],[3,7],[5,6]],
+    open:[[2,4],[3,4]]
+  },
+  {
+    /* 最优 13 → 预算 17（余 4） */
+    name:'第四层',place:'砂层',
+    cols:7,rows:9,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:4,layer:'clay'},{from:5,to:8,layer:'sand'}],
+    start:[5,0],
+    gems:[[1,5],[3,4],[4,8]],
+    open:[[3,6],[4,6]]
+  },
+  {
+    /* 最优 13.5 → 预算 17.5（余 4） */
+    name:'第五层',place:'碎石',
+    cols:7,rows:10,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:5,layer:'clay'},{from:6,to:7,layer:'sand'},{from:8,to:9,layer:'stone'}],
+    start:[1,0],
+    gems:[[1,6],[3,5],[5,8]],
+    open:[[3,7],[4,7]]
+  },
+  {
+    /* 最优 16.5 → 预算 19.5（余 3） */
+    name:'第六层',place:'卵石',
+    cols:8,rows:10,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:5,layer:'clay'},{from:6,to:7,layer:'sand'},{from:8,to:9,layer:'stone'}],
+    start:[3,0],
+    gems:[[1,5],[3,7],[5,8],[6,6]],
+    open:[[2,4],[3,4]]
+  },
+  {
+    /* 最优 17 → 预算 20（余 3） */
+    name:'第七层',place:'砂岩',
+    cols:8,rows:10,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:4,layer:'clay'},{from:5,to:6,layer:'sand'},{from:7,to:8,layer:'stone'},{from:9,to:9,layer:'deep'}],
+    start:[6,0],
+    gems:[[1,3],[2,5],[5,6],[6,8]],
+    open:[[2,3],[3,3]]
+  },
+  {
+    /* 最优 16.5 → 预算 19.5（余 3） */
+    name:'第八层',place:'泥岩',
+    cols:8,rows:11,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:4,layer:'clay'},{from:5,to:6,layer:'sand'},{from:7,to:9,layer:'stone'},{from:10,to:10,layer:'deep'}],
+    start:[1,0],
+    gems:[[1,6],[3,5],[5,6],[6,8]],
+    open:[[3,7],[4,7]]
+  },
+  {
+    /* 最优 19 → 预算 22（余 3） */
+    name:'第九层',place:'岩脉',
+    cols:8,rows:11,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:4,layer:'clay'},{from:5,to:7,layer:'sand'},{from:8,to:9,layer:'stone'},{from:10,to:10,layer:'deep'}],
+    start:[2,0],
+    gems:[[1,6],[3,7],[4,9],[6,8]],
+    open:[[2,5],[3,5],[4,6],[5,6]]
+  },
+  {
+    /* 最优 21 → 预算 24（余 3） */
+    name:'第十层',place:'石纹',
+    cols:8,rows:11,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:5,layer:'clay'},{from:6,to:7,layer:'sand'},{from:8,to:9,layer:'stone'},{from:10,to:10,layer:'deep'}],
+    start:[1,0],
+    gems:[[1,6],[3,4],[5,7],[6,10]],
+    open:[[2,5],[3,5],[4,3],[5,3]]
+  },
+  {
+    /* 最优 22 → 预算 24（余 2） */
+    name:'第十一层',place:'铁砂',
+    cols:8,rows:11,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:5,layer:'clay'},{from:6,to:6,layer:'sand'},{from:7,to:9,layer:'stone'},{from:10,to:10,layer:'deep'}],
+    start:[4,0],
+    gems:[[1,4],[2,7],[4,8],[6,9]],
+    open:[[2,3],[3,3],[3,6],[4,6]]
+  },
+  {
+    /* 最优 21 → 预算 23（余 2） */
+    name:'第十二层',place:'硬岩',
+    cols:9,rows:11,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:5,layer:'clay'},{from:6,to:7,layer:'sand'},{from:8,to:9,layer:'stone'},{from:10,to:10,layer:'deep'}],
+    start:[3,0],
+    gems:[[1,5],[3,7],[4,9],[7,9]],
+    open:[[2,4],[3,4],[4,6],[5,6]]
+  },
+  {
+    /* 最优 22 → 预算 24（余 2） */
+    name:'第十三层',place:'断层',
+    cols:9,rows:12,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:5,layer:'clay'},{from:6,to:8,layer:'sand'},{from:9,to:10,layer:'stone'},{from:11,to:11,layer:'deep'}],
+    start:[1,0],
+    gems:[[1,6],[3,8],[5,6],[6,11]],
+    open:[[2,5],[3,5],[4,7],[5,7]]
+  },
+  {
+    /* 最优 23 → 预算 25（余 2） */
+    name:'第十四层',place:'暗岩',
+    cols:9,rows:12,
+    bands:[{from:1,to:2,layer:'soil'},{from:3,to:4,layer:'clay'},{from:5,to:7,layer:'sand'},{from:8,to:10,layer:'stone'},{from:11,to:11,layer:'deep'}],
+    start:[2,0],
+    gems:[[1,6],[3,8],[5,9],[7,10]],
+    open:[[2,5],[3,5],[4,7],[5,7]]
+  },
+  {
+    /* 最优 20.5 → 预算 22.5（余 2） */
+    name:'第十五层',place:'晶脉',
+    cols:9,rows:12,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:6,layer:'clay'},{from:7,to:8,layer:'sand'},{from:9,to:10,layer:'stone'},{from:11,to:11,layer:'deep'}],
+    start:[4,0],
+    gems:[[1,6],[3,7],[5,9],[7,10]],
+    open:[[2,5],[3,5],[4,6],[5,6],[4,8],[3,8]]
+  },
+  {
+    /* 最优 20 → 预算 21（余 1） */
+    name:'第十六层',place:'深岩',
+    cols:9,rows:13,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:6,layer:'clay'},{from:7,to:9,layer:'sand'},{from:10,to:11,layer:'stone'},{from:12,to:12,layer:'deep'}],
+    start:[1,0],
+    gems:[[1,6],[3,8],[5,10],[7,11]],
+    open:[[2,5],[3,5],[4,7],[5,7],[4,9],[3,9]]
+  },
+  {
+    /* 最优 20 → 预算 21（余 1） */
+    name:'第十七层',place:'老矿',
+    cols:9,rows:13,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:5,layer:'clay'},{from:6,to:8,layer:'sand'},{from:9,to:11,layer:'stone'},{from:12,to:12,layer:'deep'}],
+    start:[2,0],
+    gems:[[1,6],[2,8],[4,7],[7,10]],
+    open:[[2,5],[3,5],[4,9],[5,9],[5,6],[6,6]]
+  },
+  {
+    /* 最优 20.5 → 预算 21.5（余 1） */
+    name:'第十八层',place:'水脉',
+    cols:9,rows:13,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:6,layer:'clay'},{from:7,to:8,layer:'sand'},{from:9,to:11,layer:'stone'},{from:12,to:12,layer:'deep'}],
+    start:[3,0],
+    gems:[[1,5],[2,8],[4,7],[7,10]],
+    open:[[2,4],[3,4],[4,9],[5,9],[5,6],[6,6]]
+  },
+  {
+    /* 最优 20.5 → 预算 21.5（余 1） */
+    name:'第十九层',place:'熔层',
+    cols:9,rows:13,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:6,layer:'clay'},{from:7,to:9,layer:'sand'},{from:10,to:11,layer:'stone'},{from:12,to:12,layer:'deep'}],
+    start:[3,0],
+    gems:[[1,3],[3,7],[5,8],[6,12]],
+    open:[[2,3],[3,3],[4,6],[5,6],[3,9],[2,9],[5,11],[4,11]]
+  },
+  {
+    /* 最优 21 → 预算 22（余 1） */
+    name:'第二十层',place:'地心',
+    cols:9,rows:13,
+    bands:[{from:1,to:3,layer:'soil'},{from:4,to:6,layer:'clay'},{from:7,to:8,layer:'sand'},{from:9,to:11,layer:'stone'},{from:12,to:12,layer:'deep'}],
+    start:[2,0],
+    gems:[[1,6],[3,7],[4,10],[7,10]],
+    open:[[2,5],[3,5],[4,6],[5,6],[5,9],[6,9],[5,11],[4,11]]
+  }
+];
+/* 教学关：三小段，分别讲移动方式、体力系统、通关方法（体力都留得很宽） */
+const TUTORIALS=[{
+  name:'教学一',place:'移动方式',tutorial:true,stage:0,remain:4,
+  goal:'用 WASD 走一格',
+  hint:'一次只走一格 · 走进旧坑道扣 0.5',
+  done:'一次一格地走，旧坑道比新土层便宜。下一课：体力怎么花。',
+  cols:5,rows:5,
+  bands:[{from:0,to:4,layer:'soil'}],
+  start:[2,0],
+  open:[[2,1],[2,2],[1,2],[0,2]],
+  gems:[[0,3]],
+  tips:{move:'移动方式 · 一次一格：WASD 或点按目的格；走进挖开的坑道只扣 0.5 点。'}
+},{
+  name:'教学二',place:'体力系统',tutorial:true,stage:1,remain:4,
+  goal:'挖开的地层越深，越费体力',
+  hint:'土 1 · 黏土 1 · 岩石 2 · 深岩 3',
+  done:'体力按地层收费，旧坑道 0.5 最便宜。下一课：算着体力通关。',
+  cols:5,rows:5,
+  bands:[{from:0,to:2,layer:'soil'},{from:3,to:3,layer:'clay'},{from:4,to:4,layer:'stone'}],
+  start:[2,0],
+  open:[[2,1],[1,1]],
+  gems:[[2,4]],
+  tips:{
+    move:'体力系统 · 走旧坑道只要 0.5 点，比挖开新格子便宜。',
+    dig:'体力系统 · 挖一格按地层收费：土 1、黏土 1、岩石 2、深岩 3。'
+  }
+},{
+  name:'教学三',place:'通关方法',tutorial:true,stage:2,remain:3,
+  goal:'收齐所有宝石才算通关',
+  hint:'收齐全部宝石 · 体力归零就失败',
+  done:'收齐宝石才算通关；正式关卡里，余下的 4 → 1 点就是命。',
+  cols:5,rows:6,
+  bands:[{from:0,to:2,layer:'soil'},{from:3,to:4,layer:'clay'},{from:5,to:5,layer:'stone'}],
+  start:[2,0],
+  open:[[2,1],[2,2],[2,3],[2,4]],
+  gems:[[1,3],[3,5]],
+  tips:{gem:'通关方法 · 收齐全部宝石才算通关，体力见底就走不动了。'}
+}
+];
+const GEM_COLORS=['#7fe3ff','#ffc46b','#c79bff','#ff9ec7'];
+
+/* ==================== 关卡状态 ==================== */
+function buildState(level){
+  const C=level.cols, R=level.rows;
+  const layerByRow=new Array(R).fill(null);
+  for(const b of level.bands) for(let r=b.from;r<=b.to;r++) layerByRow[r]=LAYERS[b.layer];
+  const dug=new Uint8Array(C*R);
+  for(let c=0;c<C;c++) dug[c]=1;
+  for(const p of (level.open||[])) dug[p[1]*C+p[0]]=1;
+  const start=level.start[1]*C+level.start[0];
+  dug[start]=1;
+  const gems=level.gems.map((p,i)=>({
+    c:p[0], r:p[1], idx:p[1]*C+p[0], col:GEM_COLORS[i%GEM_COLORS.length],
+    taken:false, phase:i*1.9
+  }));
+  return {level,C,R,layerByRow,dug,gems,start,pos:start,
+          tutorial:!!level.tutorial,tips:{}};
+}
+
+function dijkstra(dug,C,Rw,costOf,start){
+  const N=C*Rw;
+  const dist=new Float64Array(N).fill(Infinity);
+  const prev=new Int32Array(N).fill(-1);
+  const done=new Uint8Array(N);
+  dist[start]=0;
+  for(let it=0;it<N;it++){
+    let u=-1,best=Infinity;
+    for(let i=0;i<N;i++) if(!done[i]&&dist[i]<best){best=dist[i];u=i;}
+    if(u<0) break;
+    done[u]=1;
+    const c=u%C, r=(u-c)/C;
+    if(c>0){ const v=u-1; relax(v); }
+    if(c<C-1){ const v=u+1; relax(v); }
+    if(r>0){ const v=u-C; relax(v); }
+    if(r<Rw-1){ const v=u+C; relax(v); }
+    function relax(v){
+      if(done[v]) return;
+      const w=dug[v]?0.5:costOf((v-(v%C))/C);   // 走进坑道 0.5 点，挖开按地层
+      const nd=dist[u]+w;
+      if(nd<dist[v]){ dist[v]=nd; prev[v]=u; }
+    }
+  }
+  return {dist,prev};
+}
+
+/* 用「枚举取宝顺序 + 已挖格免费」求理论最优开挖格数 */
+function calcOptimal(st){
+  const C=st.C,Rw=st.R, costOf=r=>(r===0?0:st.layerByRow[r].cost);
+  const gems=st.gems.map(g=>g.idx);
+  function rec(dug,pos,rem,acc){
+    if(!rem.length) return acc;
+    let sub=Infinity;
+    for(let i=0;i<rem.length;i++){
+      const {dist,prev}=dijkstra(dug,C,Rw,costOf,pos);
+      const t=rem[i];
+      if(!isFinite(dist[t])) continue;
+      const c=acc+dist[t];
+      if(c>=sub) continue;
+      const nd=dug.slice();
+      let cur=t; let guard=0;
+      while(cur!==-1&&guard++<C*Rw+2){ nd[cur]=1; cur=prev[cur]; }
+      const v=rec(nd,t,rem.filter((_,j)=>j!==i),c);
+      if(v<sub) sub=v;
+    }
+    return sub;
+  }
+  const v=rec(st.dug,st.start,gems.slice(),0);
+  return isFinite(v)?v:null;
+}
+
+/* ==================== 运行时状态 ==================== */
+let S=null, optimal=0, energyMax=0, steps=0;
+let cell=1,gx=0,gy=0,W=0,H=0,Wcss=0,Hcss=0,DPR=1;
+let skyH=0,barH=0,padX=0;
+let tcv=null, bgcv=null, bgx=0,bgy=0,bgw=0,bgh=0;
+let parts=[], toastT=0, toastText='', shakeAmp=0, flash=0;
+let act=null, pending=null, endTimer=-1, state='title', levelIndex=0, tutStage=-1;
+let gtime=0, lastT=0, running=false;
+let pvis={c:3,r:0}, pFrom={c:0,r:0}, pTo={c:0,r:0}, moving=false, bobT=0;
+/* ==================== 布局 ==================== */
+let ctx=null;
+
+function resize(){
+  const cv=$('#cv');
+  const rect=cv.getBoundingClientRect();
+  Wcss=Math.max(200,rect.width); Hcss=Math.max(300,rect.height);
+  DPR=clamp(window.devicePixelRatio||1,1,2);
+  W=Wcss; H=Hcss;
+  cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+  if(!ctx) ctx=cv.getContext('2d');
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  if(S){
+    computeLayout();
+    createBackground();
+    buildTerrain();
+  }
+}
+
+function computeLayout(){
+  const rows=S.R;
+  skyH=Math.max(62,H*0.15);
+  barH=Math.max(52,H*0.105);
+  padX=Math.max(10,W*0.045);
+  const availW=W-padX*2;
+  const availH=H-skyH-barH;
+  cell=Math.max(22,Math.floor(Math.min(availW/S.C,availH/rows)));
+  gx=Math.round((W-cell*S.C)/2);
+  gy=Math.round(skyH+(availH-cell*rows)/2);
+}
+
+/* ==================== 远景 ==================== */
+function createBackground(){
+  const groundY=gy+cell;
+  bgw=Math.round(W*1.02);
+  bgh=Math.round(groundY+cell*S.R+cell*0.4);
+  bgx=Math.round((W-bgw)/2);
+  bgcv=document.createElement('canvas');
+  bgcv.width=Math.round(bgw*DPR); bgcv.height=Math.round(bgh*DPR);
+  const c=bgcv.getContext('2d');
+  c.setTransform(DPR,0,0,DPR,0,0);
+
+  /* 夜空 */
+  const g=c.createLinearGradient(0,0,0,groundY);
+  g.addColorStop(0,'#070910');
+  g.addColorStop(0.5,'#111722');
+  g.addColorStop(1,'#1e2532');
+  c.fillStyle=g; c.fillRect(0,0,bgw,groundY);
+
+  /* 星 */
+  for(let i=0;i<56;i++){
+    const sx=hash(i,3)*bgw, sy=hash(i,7)*groundY*0.86;
+    const s=0.5+hash(i,11)*1.5;
+    c.fillStyle='rgba(255,245,224,'+(0.12+hash(i,13)*0.5).toFixed(3)+')';
+    c.beginPath(); c.arc(sx,sy,s,0,6.2832); c.fill();
+  }
+
+  /* 月 */
+  const mr=Math.max(13,cell*0.4);
+  const mx=bgw*0.77, my=Math.max(mr+14,Math.min(groundY*0.44,mr+22));
+  const mg=c.createRadialGradient(mx,my,mr*0.4,mx,my,mr*5);
+  mg.addColorStop(0,'rgba(255,226,172,0.22)');
+  mg.addColorStop(0.4,'rgba(255,206,150,0.06)');
+  mg.addColorStop(1,'rgba(255,200,140,0)');
+  c.fillStyle=mg; c.beginPath(); c.arc(mx,my,mr*5,0,6.2832); c.fill();
+  c.fillStyle='#f5e6c8'; c.beginPath(); c.arc(mx,my,mr,0,6.2832); c.fill();
+  c.fillStyle='rgba(196,170,126,0.22)';
+  c.beginPath(); c.arc(mx-mr*0.28,my+mr*0.22,mr*0.42,0,6.2832); c.fill();
+  c.beginPath(); c.arc(mx+mr*0.34,my-mr*0.3,mr*0.24,0,6.2832); c.fill();
+
+  /* 地平线暖光 */
+  const hg=c.createRadialGradient(mx,groundY,0,mx,groundY,cell*5.5);
+  hg.addColorStop(0,'rgba(255,180,120,0.13)');
+  hg.addColorStop(1,'rgba(255,180,120,0)');
+  c.fillStyle=hg; c.fillRect(0,groundY-cell*4,bgw,cell*4);
+
+  /* 远山与林线 */
+  c.fillStyle='rgba(12,16,24,0.9)';
+  c.beginPath();
+  c.ellipse(bgw*0.2,groundY+14,bgw*0.34,cell*1.5,0,Math.PI,0);
+  c.fill();
+  const pine=(px,ph)=>{
+    c.beginPath();
+    c.moveTo(px,groundY+2);
+    c.lineTo(px-ph*0.24,groundY+2);
+    c.lineTo(px,groundY+2-ph);
+    c.lineTo(px+ph*0.24,groundY+2);
+    c.closePath();
+    c.fill();
+  };
+  c.fillStyle='#0b0f16';
+  for(let i=0;i<11;i++){
+    const px=bgw*(0.04+i*0.095)+hash(i,71)*bgw*0.02;
+    pine(px,cell*(0.55+hash(i,81)*0.75));
+  }
+
+  /* 地下底色（超出网格的部分） */
+  const dg=c.createLinearGradient(0,groundY,0,bgh);
+  dg.addColorStop(0,'#191419');
+  dg.addColorStop(1,'#0b0b0f');
+  c.fillStyle=dg; c.fillRect(0,groundY,bgw,bgh-groundY);
+}
+
+/* ==================== 地层绘制 ==================== */
+function paintSoil(c,col,row){
+  const x=col*cell, y=row*cell;
+  const L=S.layerByRow[row];
+  const v=hash(col,row);
+  const base=mixC(L.rgb,L.rgbL,0.06+v*0.16);
+  c.fillStyle=rgba(base,1);
+  c.fillRect(x,y,cell,cell);
+
+  /* 颗粒 */
+  for(let i=0;i<3;i++){
+    const hx=hash(col*7+i,row*13+i), hy=hash(col*13+i,row*7+i+1);
+    const px=x+cell*0.16+hx*cell*0.68;
+    const py=y+cell*0.16+hy*cell*0.68;
+    const rad=0.8+hash(i,col+row)*Math.max(1.2,cell*0.05);
+    c.fillStyle=rgba(hash(i*3,col+row)>0.5?L.rgbL:L.rgbD,0.34);
+    c.beginPath(); c.arc(px,py,rad,0,6.2832); c.fill();
+  }
+  /* 岩层纹理 */
+  c.strokeStyle='rgba(255,255,255,0.055)';
+  c.lineWidth=1;
+  for(let i=0;i<2;i++){
+    const yy=y+cell*(0.34+i*0.36)+Math.sin(col*0.8+row*2.1+i)*cell*0.045;
+    c.beginPath(); c.moveTo(x,yy); c.lineTo(x+cell,yy); c.stroke();
+  }
+  /* 上沿受光 */
+  c.fillStyle='rgba(255,255,255,0.05)';
+  c.fillRect(x,y,cell,1);
+}
+
+function paintTunnel(c,col,row){
+  const x=col*cell, y=row*cell;
+  const dg=c.createLinearGradient(0,y,0,y+cell);
+  dg.addColorStop(0,'#141119');
+  dg.addColorStop(0.45,'#1e1a26');
+  dg.addColorStop(1,'#2a2431');
+  c.fillStyle=dg;
+  c.fillRect(x,y,cell,cell);
+
+  /* 顶部阴影，模拟上方岩体压下来 */
+  const sg=c.createLinearGradient(0,y,0,y+cell*0.4);
+  sg.addColorStop(0,'rgba(0,0,0,0.55)');
+  sg.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=sg; c.fillRect(x,y,cell,cell*0.4);
+
+  /* 底部碎屑 */
+  for(let i=0;i<4;i++){
+    const px=x+cell*0.14+hash(col*9+i,row*5+i)*cell*0.72;
+    const py=y+cell*0.78+hash(col*5+i,row*9+i)*cell*0.14;
+    c.fillStyle='rgba(255,255,255,'+(0.03+hash(i,col)*0.07).toFixed(3)+')';
+    c.beginPath(); c.arc(px,py,0.8+hash(i,row)*1.4,0,6.2832); c.fill();
+  }
+  /* 侧壁微光 */
+  c.fillStyle='rgba(255,236,205,0.05)';
+  c.fillRect(x,y+cell*0.45,1,cell*0.5);
+  c.fillRect(x+cell-1,y+cell*0.45,1,cell*0.5);
+}
+
+function paintBoundary(c,row,surface){
+  const y=row*cell;
+  const L=S.layerByRow[row];
+  const U=surface?null:S.layerByRow[row-1];
+  for(let col=0;col<S.C;col++){
+    if(S.dug[row*S.C+col]) continue;
+    const x=col*cell;
+    const wob=surface?0:Math.sin(col*0.85+row*2.3)*cell*0.08;
+    if(surface){
+      c.fillStyle='rgba(92,110,76,0.95)';
+      c.fillRect(x,y-4,cell,6);
+      c.fillStyle='rgba(138,160,110,0.32)';
+      c.fillRect(x,y-4,cell,1.5);
+      c.fillStyle='rgba(38,46,32,0.5)';
+      c.fillRect(x,y+1,cell,2);
+    }else{
+      c.fillStyle=rgba(U.rgbD,0.6);
+      c.fillRect(x,y+wob-1,cell,2.5);
+      c.fillStyle='rgba(255,255,255,0.07)';
+      c.fillRect(x,y+wob+1.5,cell,1.2);
+    }
+  }
+}
+
+function buildTerrain(){
+  const gw=cell*S.C, gh=cell*S.R;
+  tcv=document.createElement('canvas');
+  tcv.width=Math.round(gw*DPR); tcv.height=Math.round(gh*DPR);
+  const c=tcv.getContext('2d');
+  c.setTransform(DPR,0,0,DPR,0,0);
+
+  for(let r=1;r<S.R;r++){
+    for(let col=0;col<S.C;col++){
+      if(S.dug[r*S.C+col]) paintTunnel(c,col,r);
+      else paintSoil(c,col,r);
+    }
+  }
+  for(let r=1;r<S.R;r++){
+    if(r===1) paintBoundary(c,1,true);
+    else if(S.layerByRow[r]!==S.layerByRow[r-1]) paintBoundary(c,r,false);
+  }
+  /* 土块描边，让格子可读 */
+  for(let r=1;r<S.R;r++){
+    for(let col=0;col<S.C;col++){
+      if(S.dug[r*S.C+col]) continue;
+      const x=col*cell, y=r*cell;
+      c.fillStyle='rgba(0,0,0,0.15)';
+      c.fillRect(x,y,cell,1);
+      c.fillRect(x,y,1,cell);
+      c.fillStyle='rgba(255,255,255,0.055)';
+      c.fillRect(x+1,y+cell-1,cell-2,1);
+    }
+  }
+}
+
+/* ==================== 粒子 ==================== */
+function spawnDirt(col,row,n){
+  const L=S.layerByRow[row]||LAYERS.soil;
+  const cx=gx+(col+0.5)*cell, cy=gy+(row+0.5)*cell;
+  for(let i=0;i<n;i++){
+    parts.push({
+      x:cx+(Math.random()-0.5)*cell*0.8,
+      y:cy+(Math.random()-0.5)*cell*0.8,
+      vx:(Math.random()-0.5)*cell*1.6,
+      vy:-Math.random()*cell*1.9-cell*0.3,
+      g:cell*4.2, t:0, life:0.45+Math.random()*0.4,
+      size:1.1+Math.random()*2.4,
+      col:Math.random()<0.55?L.rgb:L.rgbL,
+      rot:Math.random()*6.2, spin:(Math.random()-0.5)*7
+    });
+  }
+}
+
+function spawnSparkle(col,row,color,n){
+  const cx=gx+(col+0.5)*cell, cy=gy+(row+0.5)*cell;
+  const rgb=hex2rgb(color);
+  for(let i=0;i<n;i++){
+    const a=Math.random()*6.2832, sp=cell*(0.7+Math.random()*2.2);
+    parts.push({
+      x:cx, y:cy,
+      vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-cell*0.5,
+      g:cell*0.9, t:0, life:0.55+Math.random()*0.55,
+      size:1.4+Math.random()*2.6, col:rgb, rot:a, spin:(Math.random()-0.5)*6, glow:true
+    });
+  }
+}
+
+/* 镐刃砸到岩石时飞出的细小火星（颜色偏橙白） */
+function spawnSparks(col,row,n){
+  const cx=gx+(col+0.5)*cell, cy=gy+(row+0.5)*cell;
+  for(let i=0;i<n;i++){
+    const a=Math.random()*6.2832, sp=cell*(0.9+Math.random()*2.4);
+    parts.push({
+      x:cx+(Math.random()-0.5)*cell*0.3, y:cy+(Math.random()-0.5)*cell*0.3,
+      vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-cell*0.7,
+      g:cell*3.2, t:0, life:0.22+Math.random()*0.3,
+      size:0.7+Math.random()*1.5,
+      col:[255,Math.round(185+Math.random()*55),Math.round(120+Math.random()*80)],
+      rot:a, spin:(Math.random()-0.5)*8, glow:true
+    });
+  }
+}
+
+function updateParts(dt){
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];
+    p.t+=dt;
+    if(p.t>=p.life){ parts.splice(i,1); continue; }
+    p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.rot+=p.spin*dt;
+    if(p.x<gx-cell||p.x>gx+cell*S.C+cell) p.vx*=0.6;
+  }
+}
+
+function drawParts(c){
+  for(const p of parts){
+    const k=1-p.t/p.life;
+    c.globalAlpha=clamp(k*1.25,0,1);
+    if(p.glow){
+      c.fillStyle=rgba(p.col,1);
+      c.shadowColor=rgba(p.col,0.8); c.shadowBlur=cell*0.35;
+    }else{
+      c.fillStyle=rgba(p.col,1);
+      c.shadowBlur=0;
+    }
+    const s=p.size*(0.5+k*0.7);
+    c.save();
+    c.translate(p.x,p.y);
+    c.rotate(p.rot);
+    c.fillRect(-s/2,-s/2,s,s);
+    c.restore();
+    c.shadowBlur=0;
+  }
+  c.globalAlpha=1;
+}
+
+/* ==================== 关卡装载 ==================== */
+function setPlayerAt(idx){
+  pvis.c=idx%S.C; pvis.r=(idx-(idx%S.C))/S.C;
+}
+
+function startLevel(i){
+  /* i 可以是关卡号，也可以是 'tut' / 'tut0' / 'tut1' / 'tut2' */
+  const tut=(typeof i==='string');
+  if(tut){
+    const n=parseInt(String(i).slice(3),10);
+    tutStage=Number.isFinite(n)?clamp(n,0,TUTORIALS.length-1):0;
+    levelIndex=-1;
+  }else{
+    tutStage=-1;
+    levelIndex=clamp(i,0,LEVELS.length-1);
+  }
+  const level=tut?TUTORIALS[tutStage]:LEVELS[levelIndex];
+  S=buildState(level);
+  optimal=calcOptimal(S)||0;
+  /* 预算 = 最优代价 + 标准余量；教学关固定多给几点 */
+  const remain=level.remain!=null?level.remain:remainTarget(levelIndex+1);
+  energyMax=optimal+remain;
+  S.energy=energyMax;
+  steps=0; parts=[]; act=null; pending=null; endTimer=-1; toastT=0;
+  pvis.c=S.start%S.C; pvis.r=(S.start-(S.start%S.C))/S.C;
+  S.pos=S.start;
+  computeLayout();
+  createBackground();
+  buildTerrain();
+  state='play';
+  hideAllScreens();
+  $('#hudBtns').classList.add('show');
+  toast(tut?('教学 '+(tutStage+1)+'/'+TUTORIALS.length+' · '+level.goal)
+           :level.name+' · '+level.place+(level.open&&level.open.length?' · 旧矿道':''));
+}
+
+function restartLevel(){
+  if(levelIndex>=0) startLevel(levelIndex);
+  else startLevel('tut'+Math.max(0,tutStage));
+}
+/* ==================== 绘制 ==================== */
+const FONT='"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif';
+
+function roundPath(c,x,y,w,h,r){
+  r=Math.min(r,w*0.5,h*0.5);
+  c.beginPath();
+  c.moveTo(x+r,y);
+  c.lineTo(x+w-r,y); c.arcTo(x+w,y,x+w,y+r,r);
+  c.lineTo(x+w,y+h-r); c.arcTo(x+w,y+h,x+w-r,y+h,r);
+  c.lineTo(x+r,y+h); c.arcTo(x,y+h,x,y+h-r,r);
+  c.lineTo(x,y+r); c.arcTo(x,y,x+r,y,r);
+  c.closePath();
+}
+
+function drawLight(){
+  const cx=gx+(pvis.c+0.5)*cell, cy=gy+(pvis.r+0.5)*cell;
+  const rad=cell*2.7;
+  const g=ctx.createRadialGradient(cx,cy,0,cx,cy,rad);
+  g.addColorStop(0,'rgba(255,214,160,0.20)');
+  g.addColorStop(0.45,'rgba(255,198,140,0.07)');
+  g.addColorStop(1,'rgba(255,190,130,0)');
+  ctx.globalCompositeOperation='lighter';
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(cx,cy,rad,0,6.2832); ctx.fill();
+
+  const hy=cy-cell*0.2;
+  const cg=ctx.createLinearGradient(0,hy,0,hy+cell*2.3);
+  cg.addColorStop(0,'rgba(255,224,172,0.17)');
+  cg.addColorStop(1,'rgba(255,224,172,0)');
+  ctx.fillStyle=cg;
+  ctx.beginPath();
+  ctx.moveTo(cx-cell*0.17,hy);
+  ctx.lineTo(cx+cell*0.17,hy);
+  ctx.lineTo(cx+cell*0.72,hy+cell*2.3);
+  ctx.lineTo(cx-cell*0.72,hy+cell*2.3);
+  ctx.closePath(); ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+}
+
+function drawGems(t){
+  for(const g of S.gems){
+    if(g.taken) continue;
+    const cx=gx+(g.c+0.5)*cell, cy=gy+(g.r+0.5)*cell;
+    const dug=S.dug[g.idx];
+    const pulse=0.5+0.5*Math.sin(t*0.0026+g.phase);
+    const bob=dug?Math.sin(t*0.0022+g.phase)*cell*0.06:0;
+    const s=cell*(dug?0.25:0.2)*(1+pulse*0.12);
+    const rgb=hex2rgb(g.col);
+    const gr=cell*(dug?1.15:0.72);
+
+    ctx.globalCompositeOperation='lighter';
+    const rg=ctx.createRadialGradient(cx,cy+bob,0,cx,cy+bob,gr);
+    rg.addColorStop(0,rgba(rgb,dug?0.42:0.26));
+    rg.addColorStop(0.45,rgba(rgb,0.07));
+    rg.addColorStop(1,rgba(rgb,0));
+    ctx.fillStyle=rg;
+    ctx.beginPath(); ctx.arc(cx,cy+bob,gr,0,6.2832); ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+
+    ctx.save();
+    ctx.translate(cx,cy+bob);
+    ctx.beginPath();
+    ctx.moveTo(0,-s*1.45);
+    ctx.lineTo(s,0);
+    ctx.lineTo(0,s*1.45);
+    ctx.lineTo(-s,0);
+    ctx.closePath();
+    ctx.fillStyle=rgba(mixC(rgb,[255,255,255],0.42),0.95);
+    ctx.fill();
+    ctx.strokeStyle=rgba(mixC(rgb,[0,0,0],0.35),0.7);
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0,-s*1.45); ctx.lineTo(0,s*1.45);
+    ctx.strokeStyle='rgba(255,255,255,0.45)';
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawDigOverlay(){
+  if(!act||act.kind!=='dig'||act.applied) return;
+  const col=act.to%S.C, row=(act.to-col)/S.C;
+  const x=gx+col*cell, y=gy+row*cell;
+  /* 只覆盖抡镐这一段，命中后格子已经破开，高亮跟着消失 */
+  const p=clamp(act.t/(act.dur*act.hitAt),0,1);
+  ctx.fillStyle='rgba(255,240,210,'+(0.10*p).toFixed(3)+')';
+  ctx.fillRect(x,y,cell,cell);
+  ctx.strokeStyle='rgba(20,14,10,'+(0.42*p).toFixed(3)+')';
+  ctx.lineWidth=1.2;
+  const c0x=x+cell*0.5, c0y=y+cell*0.5;
+  for(let i=0;i<4;i++){
+    const a=0.3+i*1.35+hash(col,row+i)*0.5;
+    const len=cell*0.5*p;
+    ctx.beginPath();
+    ctx.moveTo(c0x,c0y);
+    ctx.lineTo(c0x+Math.cos(a)*len, c0y+Math.sin(a)*len);
+    ctx.stroke();
+  }
+}
+
+/* 挖格时的镐子：木柄 + 柄端一根 T 字型横杠，先抬镐蓄力再抡下去砸中目标格，砸中那一刻格子才破开
+   本地坐标 +x 从握把指向目标（挥镐方向），+y 与之垂直 */
+function drawPickaxe(t){
+  if(!act||act.kind!=='dig'||state!=='play') return;
+  const toC=act.to%S.C, toR=(act.to-toC)/S.C;
+  const ang=Math.atan2(pTo.r-pFrom.r,pTo.c-pFrom.c);
+  const tx=gx+(toC+0.5)*cell, ty=gy+(toR+0.5)*cell;            // 落点：目标格中心
+  const pc=act.applied?pvis:pFrom;                              // 命中后镐子跟着手一起走
+  const px=gx+(pc.c+0.5)*cell, py=gy+(pc.r+0.5)*cell;          // 人物（握把所在格）
+  const p=clamp(act.t/act.dur,0,1);
+  const hitP=clamp(p/act.hitAt,0,1);                           // 抡镐进度：0 起手 → 1 命中
+  /* 命中后先在终点“钉住”一小会儿（hitAt → holdAt），再从 holdAt 开始收镐 */
+  const holdW=Math.max(0.001,act.holdAt-act.hitAt);
+  const fade=act.applied?clamp(1-(p-act.holdAt)/0.10,0,1):1;    // 停顿结束后迅速收镐
+  const retract=act.applied?clamp((p-act.holdAt)/(1-act.holdAt),0,1):0;
+  const show=clamp(p/0.12,0,1);                                 // 出场淡入
+
+  const grip=cell*0.34;                                         // 握把离人物中心的距离（略大于身体半径，柄从身体边缘伸出去）
+  const L=cell*0.76;                                            // 握把到“柄端”的长度
+  const pivotX=px+Math.cos(ang)*grip, pivotY=py+Math.sin(ang)*grip;
+
+  /* 起手：把镐子抡到上方/身后蓄力（左右两侧挑更朝上的那一侧，竖直方向则挑朝右的一侧），再加速砸向目标 */
+  const SW=2.25;                                                // 抡的幅度（约 129°）
+  const aP=ang+SW, aM=ang-SW;
+  const sP=Math.sin(aP), sM=Math.sin(aM);
+  const sA=(Math.abs(sP-sM)<0.05)?(Math.cos(aP)>=0?aP:aM):(sP<sM?aP:aM);
+  const swing=sA-ang;
+  const dir=swing>=0?1:-1;
+  let off=swing*Math.pow(1-hitP,2.2);                           // 先慢后快
+  if(act.applied){
+    const q=clamp((p-act.hitAt)/holdW,0,1);
+    /* 命中后镐刃钉在终点，只留一点快速衰减的颤动 */
+    off=dir*0.055*Math.sin(q*Math.PI*2)*(1-q)*(1-q);
+  }
+  const base=ang+off;
+
+  const hw=cell*0.042;                // 木柄半宽
+  const headX=L*0.78;                 // 镐头（T 型横杠）横担在柄端
+  const hubR=cell*0.050;              // 镐头根部的半厚
+  const Wl=cell*0.235;                // 横杠向 -y 一侧伸出
+  const Ws=cell*0.235;                // 横杠向 +y 一侧伸出
+
+  function body(){
+    /* —— 木柄：五段木质渐变 + 两道木纹 —— */
+    const hg=ctx.createLinearGradient(0,-hw,0,hw);
+    hg.addColorStop(0,'#3a2413');
+    hg.addColorStop(0.22,'#9a6c3a');
+    hg.addColorStop(0.46,'#e2b87f');
+    hg.addColorStop(0.72,'#8b5e33');
+    hg.addColorStop(1,'#2e1d0e');
+    ctx.beginPath();
+    roundPath(ctx,0,-hw,headX+hw*1.8,hw*2,hw*0.85);
+    ctx.fillStyle=hg; ctx.fill();
+    ctx.strokeStyle='rgba(24,14,6,0.65)'; ctx.lineWidth=Math.max(1,cell*0.008); ctx.stroke();
+    ctx.lineWidth=Math.max(1,cell*0.006); ctx.strokeStyle='rgba(64,38,16,0.34)';
+    ctx.beginPath(); ctx.moveTo(cell*0.06,-hw*0.30); ctx.lineTo(headX*0.94,-hw*0.10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cell*0.08,hw*0.42); ctx.lineTo(headX*0.80,hw*0.04); ctx.stroke();
+
+    /* 缠绳两道，压住柄中段 */
+    for(let i=0;i<2;i++){
+      const rx=cell*0.20+i*cell*0.060;
+      const rg=ctx.createLinearGradient(0,-hw*1.25,0,hw*1.25);
+      rg.addColorStop(0,'#22170e'); rg.addColorStop(0.45,'#7a5b3a'); rg.addColorStop(1,'#1c120a');
+      ctx.beginPath();
+      roundPath(ctx,rx,-hw*1.25,cell*0.040,hw*2.5,hw*0.4);
+      ctx.fillStyle=rg; ctx.fill();
+    }
+
+    /* —— 攥着柄的拳头：压在柄上、贴着身体边缘，让“人握着镐”这件事成立 —— */
+    ctx.beginPath();
+    ctx.ellipse(cell*0.020,0,cell*0.062,cell*0.052,-0.12,0,6.2832);
+    ctx.fillStyle='#f0e7d5'; ctx.fill();
+    ctx.strokeStyle='rgba(28,24,30,0.40)'; ctx.lineWidth=Math.max(1,cell*0.007); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cell*-0.008,-cell*0.034);
+    ctx.quadraticCurveTo(cell*0.026,-cell*0.010,cell*0.058,cell*0.018);
+    ctx.lineWidth=Math.max(1,cell*0.006);
+    ctx.strokeStyle='rgba(196,168,138,0.5)'; ctx.stroke();
+
+    /* —— 镐头：一根横杠（T 字型），两端收成尖，中段在柄上略微凸出 —— */
+    const bt=cell*0.052;                            // 横杠半厚
+    const mg=ctx.createLinearGradient(0,-Wl*1.05,0,Ws*1.05);
+    mg.addColorStop(0,'#f4faff');
+    mg.addColorStop(0.30,'#dbe6f1');
+    mg.addColorStop(0.56,'#b7c4d1');
+    mg.addColorStop(0.80,'#7f8d9b');
+    mg.addColorStop(1,'#4e5a67');
+
+    ctx.beginPath();
+    ctx.moveTo(headX-bt*0.55,-Wl*0.86);
+    ctx.lineTo(headX+bt*0.18,-Wl*1.02);             // 上端刀尖
+    ctx.lineTo(headX+bt*1.02,-Wl*0.60);
+    ctx.quadraticCurveTo(headX+bt*1.55,0,headX+bt*1.02, Ws*0.60);
+    ctx.lineTo(headX+bt*0.18, Ws*1.02);             // 下端刀尖
+    ctx.lineTo(headX-bt*0.55, Ws*0.86);
+    ctx.quadraticCurveTo(headX-bt*0.95,0,headX-bt*0.55,-Wl*0.86);
+    ctx.closePath();
+    ctx.fillStyle=mg; ctx.fill();
+    ctx.strokeStyle='rgba(8,11,16,0.80)'; ctx.lineWidth=Math.max(1.2,cell*0.008); ctx.stroke();
+
+    /* 横杠的正面（砸击面）一道镜面高光、背面一道暗边，交代厚度 */
+    ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.moveTo(headX+bt*1.02,-Wl*0.62);
+    ctx.quadraticCurveTo(headX+bt*1.62,0,headX+bt*1.02, Ws*0.62);
+    ctx.lineWidth=cell*0.012; ctx.strokeStyle='rgba(255,255,255,0.70)'; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(headX-bt*0.55,-Wl*0.72);
+    ctx.quadraticCurveTo(headX-bt*0.96,0,headX-bt*0.55, Ws*0.72);
+    ctx.lineWidth=cell*0.013; ctx.strokeStyle='rgba(10,14,20,0.42)'; ctx.stroke();
+    /* 两个刀尖的点光 */
+    ctx.fillStyle='rgba(255,255,255,0.85)';
+    ctx.beginPath(); ctx.arc(headX+bt*0.28,-Wl*0.94,cell*0.011,0,6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(headX+bt*0.28, Ws*0.94,cell*0.011,0,6.2832); ctx.fill();
+
+    /* 装柄的钢箍：中间比横杠稍粗的一块，交代柄与镐头的接口 */
+    const kg=ctx.createLinearGradient(0,-hubR*1.5,0,hubR*1.5);
+    kg.addColorStop(0,'#2a323b'); kg.addColorStop(0.30,'#b9c8d6');
+    kg.addColorStop(0.62,'#6b7987'); kg.addColorStop(1,'#161b21');
+    ctx.beginPath();
+    roundPath(ctx,headX-cell*0.048,-hubR*1.42,cell*0.100,hubR*2.84,cell*0.022);
+    ctx.fillStyle=kg; ctx.fill();
+    ctx.strokeStyle='rgba(6,9,13,0.82)'; ctx.lineWidth=1.1; ctx.stroke();
+
+    /* 砸击面越接近命中越亮的一点暖光 */
+    const heat=act.applied?1:Math.pow(hitP,2.5);
+    ctx.globalCompositeOperation='lighter';
+    const gx0=headX+bt*1.42, gy0=0;
+    const ptg=ctx.createRadialGradient(gx0,gy0,0,gx0,gy0,cell*0.10);
+    ptg.addColorStop(0,'rgba(255,214,150,'+(0.34*heat).toFixed(3)+')');
+    ptg.addColorStop(1,'rgba(255,140,60,0)');
+    ctx.fillStyle=ptg;
+    ctx.beginPath(); ctx.arc(gx0,gy0,cell*0.10,0,6.2832); ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+  }
+
+  const paint=(a0,al,sc)=>{
+    ctx.save();
+    ctx.globalAlpha=al;
+    ctx.translate(pivotX,pivotY);
+    ctx.rotate(a0);
+    if(sc&&sc!==1) ctx.scale(sc,sc);
+    body();
+    ctx.restore();
+  };
+
+  /* 抡下去的后半段留两道残影，交代这抡的速度（残影落在起手一侧） */
+  if(!SETTINGS.reduce&&!act.applied&&hitP>0.25){
+    const ta=0.22*Math.pow(hitP,0.8);
+    paint(base+dir*0.26,ta*0.40,1);
+    paint(base+dir*0.13,ta*0.70,1);
+  }
+  /* 停顿结束、人物开始平移时，镐子边淡出边往手里收 */
+  paint(base,fade*show,1-0.45*retract);
+
+  /* 命中：落点炸一下白光（在停顿这段时间里淡掉） */
+  if(act.applied){
+    const q=clamp((p-act.hitAt)/holdW,0,1);
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    const ir=cell*(0.13+0.22*q);
+    const ig=ctx.createRadialGradient(tx,ty,0,tx,ty,ir);
+    ig.addColorStop(0,'rgba(255,244,214,'+(0.62*(1-q)*(1-q)).toFixed(3)+')');
+    ig.addColorStop(1,'rgba(255,150,70,0)');
+    ctx.fillStyle=ig;
+    ctx.beginPath(); ctx.arc(tx,ty,ir,0,6.2832); ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawPlayer(t){
+  const cx=gx+(pvis.c+0.5)*cell, cy=gy+(pvis.r+0.5)*cell;
+  const r=cell*0.29;
+  /* 抡镐时人物原地蓄力：先往后仰、命中前归位；停顿结束后才平移，才走“走路”的上下起伏 */
+  const pp=act?clamp(act.t/act.dur,0,1):1;
+  const sliding=!act||act.kind!=='dig'||pp>=act.holdAt;
+  const bob=(sliding&&moving)?Math.sin(bobT*22)*cell*0.05:Math.sin(t*0.0021)*cell*0.014;
+  let leanX=0, leanY=0, tilt=0;
+  if(act&&act.kind==='dig'&&!act.applied){
+    const k=clamp(act.t/(act.dur*act.hitAt),0,1);
+    const ang=Math.atan2(pTo.r-pFrom.r,pTo.c-pFrom.c);
+    const back=cell*0.075*Math.sin(k*Math.PI);      // 蓄力后仰，砸下的瞬间收回来
+    leanX=-Math.cos(ang)*back;
+    leanY=-Math.sin(ang)*back;
+    tilt=Math.sin(act.t*0.06)*0.05;
+  }
+
+  ctx.fillStyle='rgba(0,0,0,0.38)';
+  ctx.beginPath();
+  ctx.ellipse(cx,cy+r*1.5,r*1.1,r*0.35,0,0,6.2832);
+  ctx.fill();
+
+  ctx.save();
+  ctx.translate(cx+leanX,cy+bob+leanY);
+  if(tilt) ctx.rotate(tilt);
+  /* 身体 */
+  ctx.beginPath(); ctx.arc(0,0,r,0,6.2832);
+  ctx.fillStyle='#f0e7d5'; ctx.fill();
+  ctx.strokeStyle='rgba(28,24,30,0.5)'; ctx.lineWidth=1.4; ctx.stroke();
+  /* 头盔 */
+  ctx.beginPath(); ctx.arc(0,-r*0.2,r*1.0,Math.PI*1.02,Math.PI*1.98);
+  ctx.fillStyle='#4b4655'; ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.18)';
+  ctx.beginPath(); ctx.arc(0,-r*0.2,r*0.98,Math.PI*1.12,Math.PI*1.36); ctx.fill();
+  ctx.fillStyle='#2f2b37';
+  ctx.fillRect(-r*1.06,-r*0.26,r*2.12,r*0.16);
+  /* 矿灯 */
+  ctx.beginPath(); ctx.arc(0,-r*0.83,r*0.19,0,6.2832);
+  ctx.fillStyle='#ffd98d'; ctx.fill();
+  ctx.beginPath(); ctx.arc(0,-r*0.83,r*0.42,0,6.2832);
+  ctx.fillStyle='rgba(255,215,140,0.30)'; ctx.fill();
+  /* 眼睛 */
+  ctx.fillStyle='#2a2430';
+  ctx.beginPath(); ctx.arc(-r*0.32,r*0.12,r*0.13,0,6.2832); ctx.fill();
+  ctx.beginPath(); ctx.arc(r*0.32,r*0.12,r*0.13,0,6.2832); ctx.fill();
+  ctx.fillStyle='rgba(255,150,120,0.35)';
+  ctx.beginPath(); ctx.arc(-r*0.6,r*0.4,r*0.12,0,6.2832); ctx.fill();
+  ctx.beginPath(); ctx.arc(r*0.6,r*0.4,r*0.12,0,6.2832); ctx.fill();
+  ctx.restore();
+}
+
+function draw(t){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#06070b';
+  ctx.fillRect(0,0,W,H);
+  if(bgcv) ctx.drawImage(bgcv,bgx,0,bgw,bgh);
+
+  ctx.save();
+  if(shakeAmp>0.3&&!SETTINGS.reduce)
+    ctx.translate((Math.random()-0.5)*shakeAmp,(Math.random()-0.5)*shakeAmp);
+
+  if(tcv) ctx.drawImage(tcv,gx,gy,cell*S.C,cell*S.R);
+  drawLight();
+  drawGems(t);
+  drawDigOverlay();
+  drawPlayer(t);
+  drawPickaxe(t);
+  drawParts(ctx);
+  ctx.restore();
+
+  drawHUD();
+}
+
+function drawHUD(){
+  const y0=H-barH;
+  ctx.fillStyle='rgba(6,7,11,0.6)';
+  ctx.fillRect(0,y0,W,barH);
+  const hg=ctx.createLinearGradient(0,y0,0,y0+barH);
+  hg.addColorStop(0,'rgba(255,255,255,0.04)');
+  hg.addColorStop(1,'rgba(0,0,0,0.18)');
+  ctx.fillStyle=hg; ctx.fillRect(0,Math.round(y0),W,barH);
+  ctx.fillStyle='rgba(255,255,255,0.08)';
+  ctx.fillRect(0,Math.round(y0),W,1);
+
+  const fs=clamp(H*0.0185,10,14);
+  const cy=y0+barH*0.52;
+  ctx.textBaseline='middle';
+
+  /* 宝石 */
+  const gx0=padX+8;
+  const gsize=Math.max(5,fs*0.62);
+  ctx.beginPath();
+  ctx.moveTo(gx0,cy-gsize*1.3);
+  ctx.lineTo(gx0+gsize*0.95,cy);
+  ctx.lineTo(gx0,cy+gsize*1.3);
+  ctx.lineTo(gx0-gsize*0.95,cy);
+  ctx.closePath();
+  ctx.fillStyle='#ffc46b'; ctx.fill();
+  const taken=S.gems.filter(g=>g.taken).length;
+  ctx.font='500 '+fs+'px '+FONT;
+  ctx.textAlign='left';
+  ctx.fillStyle='rgba(240,235,225,0.9)';
+  ctx.fillText(taken+' / '+S.gems.length, gx0+gsize*1.9, cy);
+
+  /* 体力 */
+  const bx=padX+62, bw=Math.max(60,W-padX-42-bx);
+  const bh=Math.max(7,H*0.013);
+  const by=cy-bh/2;
+  ctx.font='400 '+Math.max(9,fs-1)+'px '+FONT;
+  ctx.fillStyle='rgba(255,255,255,0.34)';
+  ctx.fillText('体力', bx, cy-bh-9);
+
+  roundPath(ctx,bx,by,bw,bh,bh/2);
+  ctx.fillStyle='rgba(255,255,255,0.09)'; ctx.fill();
+  const frac=clamp(S.energy/energyMax,0,1);
+  if(frac>0){
+    roundPath(ctx,bx,by,Math.max(bh,bw*frac),bh,bh/2);
+    const bgr=ctx.createLinearGradient(bx,0,bx+bw,0);
+    if(frac<0.25){ bgr.addColorStop(0,'#ef7a5f'); bgr.addColorStop(1,'#cf4d42'); }
+    else{ bgr.addColorStop(0,'#ffd88a'); bgr.addColorStop(1,'#e79c3c'); }
+    ctx.fillStyle=bgr; ctx.fill();
+  }
+  ctx.fillStyle='rgba(0,0,0,0.26)';
+  for(let i=1;i<energyMax;i++) ctx.fillRect(bx+bw*i/energyMax,by,1,bh);
+
+  ctx.font='600 '+(fs+2)+'px '+FONT;
+  ctx.textAlign='right';
+  ctx.fillStyle='rgba(246,240,230,0.95)';
+  ctx.fillText(fmtE(S.energy), W-padX, cy);
+
+  /* 顶部标题 */
+  const lv=S.level;
+  ctx.font='400 '+clamp(H*0.016,10,13)+'px '+FONT;
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(255,255,255,0.42)';
+  const tag=levelIndex>=0?((levelIndex+1)+'/'+LEVELS.length)
+                        :('教学 '+((S.level.stage||0)+1)+'/'+TUTORIALS.length);
+  ctx.fillText(lv.name+' · '+lv.place+'　'+tag, W/2, Math.max(58,H*0.095));
+
+  /* 提示：目标（教学关换成当前这一课的要点） */
+  ctx.font='400 '+clamp(H*0.014,9,12)+'px '+FONT;
+  ctx.fillStyle=S.tutorial?'rgba(255,236,205,0.46)':'rgba(255,255,255,0.24)';
+  ctx.fillText(lv.hint||'WASD ／ 点按 · 走一格', W/2, Math.max(78,H*0.095)+16);
+
+  if(toastT>0) drawToast();
+}
+
+function drawToast(){
+  const a=Math.min(1,(2.2-toastT)/0.16,toastT/0.55);
+  if(a<=0) return;
+  const fs=clamp(H*0.017,10,13);
+  ctx.font='500 '+fs+'px '+FONT;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const tw=ctx.measureText(toastText).width;
+  const w=tw+30, h=fs+18;
+  const x=W/2-w/2;
+  const below=gy+cell*S.R+6;
+  const hintY=Math.max(78,H*0.095)+16;
+  let y;
+  if(below+h<=H-barH-10) y=below;             // 网格下方还有空位
+  else if(hintY+24+h<=gy-10) y=hintY+24;      // 放到夜空里，避免挡住地层
+  else y=H-barH-h-8;
+  ctx.globalAlpha=a;
+  roundPath(ctx,x,y,w,h,h/2);
+  ctx.fillStyle='rgba(8,9,14,0.85)'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle='rgba(245,240,232,0.92)';
+  ctx.fillText(toastText,W/2,y+h/2+0.5);
+  ctx.globalAlpha=1;
+}
+
+/* ==================== 更新 ==================== */
+function update(dt){
+  if(!S) return;
+  updateParts(dt);
+  if(toastT>0) toastT-=dt;
+  if(shakeAmp>0){
+    shakeAmp*=Math.pow(0.0009,dt);
+    if(shakeAmp<0.4) shakeAmp=0;
+  }
+  if(state!=='play') return;
+  if(endTimer>=0){
+    endTimer-=dt;
+    if(endTimer<=0){ endTimer=-1; failLevel(); return; }
+  }
+  if(act){
+    const a=act;
+    a.t+=dt;
+    const p=clamp(a.t/a.dur,0,1);
+    if(a.kind==='dig'&&!a.applied){
+      /* 第一段：抡镐。人物留在原地蓄力，镐头砸中目标格的那一刻才破格 */
+      pvis.c=pFrom.c;
+      pvis.r=pFrom.r;
+      if(p>=a.hitAt){
+        a.applied=true;
+        if(!SETTINGS.reduce){
+          const hc=a.to%S.C, hr=(a.to-hc)/S.C;
+          spawnSparks(hc,hr,10);   /* 镐头落点的火星一把炸开 */
+        }
+        completeDig(a.to);        /* 命中瞬间：目标格破开，里面的宝石一起消失 */
+      }
+    }
+    if(a.applied||a.kind!=='dig'){
+      /* 第三段：停顿结束后，人物从原格平移到已经挖开的格子 */
+      const q=a.kind==='dig'?clamp((p-a.holdAt)/(1-a.holdAt),0,1):p;
+      const e=easeInOut(q);
+      pvis.c=lerp(pFrom.c,pTo.c,e);
+      pvis.r=lerp(pFrom.r,pTo.r,e);
+    }
+    if(p>=1){
+      const won=!!a.winAtEnd;
+      moving=false; act=null;
+      S.pos=a.to;
+      if(won){
+        pending=null;
+        winLevel();               /* 宝石在钻孔时就收完了，落地后再结算 */
+      }else if(pending){
+        const nx=pending; pending=null;
+        if(state==='play') stepMove(nx.dc,nx.dr);
+      }
+    }
+  }else if(moving){
+    moving=false;
+  }
+  if(moving) bobT+=dt;
+}
+
+function startAct(a){
+  act=a;
+  act.t=0; act.applied=false;
+  /* 挖格分成三段：抡镐 → 命中后在终点停顿 → 再平移到目标格 */
+  act.hitAt=a.kind==='dig'?0.58:0;
+  act.holdAt=a.kind==='dig'?0.80:0;
+  act.winAtEnd=false;
+  pFrom.c=pvis.c; pFrom.r=pvis.r;
+  const col=a.to%S.C;
+  pTo.c=col; pTo.r=(a.to-col)/S.C;
+  moving=true; bobT=0;
+}
+
+function toast(msg){ toastText=msg; toastT=2.2; }
+/* 面板盖住画布时，用 DOM 气泡提示（例如点未解锁的关卡） */
+function domToast(msg){
+  const t=$('#toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(domToast._tid);
+  domToast._tid=setTimeout(()=>t.classList.remove('show'),1600);
+}
+/* ==================== 移动与操作 ==================== */
+const DIRS=[[-1,0],[1,0],[0,-1],[0,1]];
+
+function inside(col,row){ return col>=0&&col<S.C&&row>=0&&row<S.R; }
+
+/* 体力不够时判断是否还能继续挖 */
+function canStillDig(){
+  const N=S.C*S.R;
+  const seen=new Uint8Array(N);
+  const from=S.pos;
+  seen[from]=1;
+  const q=[from];
+  for(let i=0;i<q.length;i++){
+    const u=q[i], c=u%S.C, r=(u-c)/S.C;
+    for(let d=0;d<4;d++){
+      const nc=c+DIRS[d][0], nr=r+DIRS[d][1];
+      if(!inside(nc,nr)) continue;
+      const v=nr*S.C+nc;
+      if(S.dug[v]){
+        if(!seen[v]){ seen[v]=1; q.push(v); }
+      }else if(S.layerByRow[nr]&&S.layerByRow[nr].cost<=S.energy){
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/* 教学关的分段提示，每种只出现一次，文案跟着当前这一课走 */
+function tutTip(key){
+  if(!S||!S.tutorial||!S.tips) return;
+  if(S.tips[key]) return;
+  const msg=(S.level.tips||{})[key];
+  if(!msg) return;
+  S.tips[key]=1;
+  toast(msg);
+}
+
+/* 走一格：进入已挖格耗 0.5 点体力，挖开地层按该层消耗 */
+function stepMove(dc,dr){
+  if(state!=='play'||!S) return;
+  if(act){ pending={dc,dr}; return; }   // 动画中先记下一步，避免丢键
+  const c=S.pos%S.C, r=(S.pos-c)/S.C;
+  const nc=c+dc, nr=r+dr;
+  if(!inside(nc,nr)){ shakeAmp=cell*0.05; return; }
+  const idx=nr*S.C+nc;
+  const dug=!!S.dug[idx];
+  const cost=dug?0.5:S.layerByRow[nr].cost;
+  if(S.energy<cost){
+    toast(dug?'体力已经用完了':'这块岩层要 '+cost+' 点体力');
+    shakeAmp=cell*0.1;
+    if(!canStillDig()&&endTimer<0) endTimer=0.9;
+    return;
+  }
+  Sfx.resume();
+  if(dug){
+    S.energy=Math.max(0,S.energy-cost);
+    steps++;
+    Sfx.step();
+    tutTip('move');
+    if(S.energy<=0&&endTimer<0) endTimer=0.6;
+  }
+  startAct({kind:dug?'move':'dig',to:idx,cost,dur:dug?0.16:(cost>1?0.72:0.66)});
+}
+
+/* 点按同样只走一格：朝点到的方向迈一步 */
+function onTap(px,py){
+  if(state!=='play'||!S) return;
+  const col=Math.floor((px-gx)/cell), row=Math.floor((py-gy)/cell);
+  if(!inside(col,row)) return;
+  const c=S.pos%S.C, r=(S.pos-c)/S.C;
+  const dcol=col-c, drow=row-r;
+  if(!dcol&&!drow) return;
+  if(Math.abs(dcol)>=Math.abs(drow)) stepMove(Math.sign(dcol),0);
+  else stepMove(0,Math.sign(drow));
+}
+
+function repaintCell(idx){
+  if(!tcv) return;
+  const col=idx%S.C, row=(idx-col)/S.C;
+  const c=tcv.getContext('2d');
+  c.setTransform(DPR,0,0,DPR,0,0);
+  paintTunnel(c,col,row);
+}
+
+function completeDig(idx){
+  const col=idx%S.C, row=(idx-col)/S.C;
+  const L=S.layerByRow[row];
+  S.dug[idx]=1;
+  repaintCell(idx);
+  S.energy=Math.max(0,S.energy-L.cost);
+  steps++;
+  tutTip('dig');
+  spawnDirt(col,row,10);
+  shakeAmp=cell*(L.cost>1?0.2:0.13);
+  Sfx.dig(L.cost>=2);
+  vibrate(L.cost>=2?18:8);
+
+  const gem=S.gems.find(g=>g.idx===idx&&!g.taken);
+  if(gem){
+    gem.taken=true;
+    spawnSparkle(col,row,gem.col,20);
+    Sfx.gem();
+    vibrate(26);
+    tutTip('gem');
+  }
+  if(S.gems.every(g=>g.taken)){
+    /* 两段式移动：等人物也滑进目标格后再结算 */
+    if(act&&act.kind==='dig') act.winAtEnd=true;
+    else winLevel();
+  }
+  else if(S.energy<=0&&endTimer<0) endTimer=0.6;
+}
+
+/* ==================== 结算 ==================== */
+function winLevel(){
+  state='win';
+  act=null; pending=null; endTimer=-1; moving=false;
+  Sfx.win();
+  vibrate([24,40,60]);
+  if(S.tutorial){
+    /* 三课全过才算教学完成 */
+    if(S.level.stage>=TUTORIALS.length-1) PROGRESS.tut=true;
+  }else{
+    PROGRESS.cleared=Math.max(PROGRESS.cleared,levelIndex+1);
+    PROGRESS.level=Math.min(LEVELS.length-1,levelIndex+1);
+  }
+  DB.set('progress',PROGRESS);
+  updateProgressHint();
+  setTimeout(()=>{ if(state==='win') showResult(true); },430);
+}
+
+function failLevel(){
+  state='fail';
+  act=null; pending=null; moving=false;
+  Sfx.fail();
+  vibrate([90,50,90]);
+  setTimeout(()=>{ if(state==='fail') showResult(false); },300);
+}
+
+function showResult(win){
+  const lv=S.level;
+  const left=Math.max(0,S.energy);
+  $('#rsEyebrow').textContent=lv.name+' · '+lv.place;
+  $('#rsLeft').textContent=fmtE(left);
+  $('#rsDig').textContent=steps;
+  $('#rsBest').textContent=fmtE(optimal);
+  const next=$('#rsNext');
+  if(S.tutorial){
+    const st=S.level.stage!=null?S.level.stage:Math.max(0,tutStage);
+    const last=st>=TUTORIALS.length-1;
+    if(win){
+      $('#rsTitle').textContent='教学'+(st+1)+' 完成';
+      $('#rsDesc').textContent=lv.done||'';
+      next.style.display='';
+      next.textContent=last?'开始第一层　›':('下一课 · '+TUTORIALS[st+1].place+'　›');
+    }else{
+      $('#rsTitle').textContent='没挖到';
+      $('#rsDesc').textContent='教学关体力很足，再来一次就好。';
+      next.style.display='none';
+    }
+  }else if(win){
+    $('#rsTitle').textContent='挖到了';
+    $('#rsDesc').textContent=
+      '余下 '+fmtE(left)+' 点体力。'+(left>=energyMax-optimal?'这条路很干净。':'还有更省的做法。');
+    const hasNext=levelIndex+1<LEVELS.length;
+    next.style.display='';
+    next.textContent=hasNext?('下一层 · '+LEVELS[levelIndex+1].place+'　›'):'从头再来';
+  }
+  else{
+    const missing=S.gems.filter(g=>!g.taken).length;
+    $('#rsTitle').textContent='体力耗尽';
+    $('#rsDesc').textContent='还差 '+missing+' 颗宝石。换一条路，也许就够了。';
+    next.style.display='none';
+  }
+  $('#hudBtns').classList.remove('show');
+  toggle('#resultPanel',true);
+}
+
+/* ==================== 界面 ==================== */
+function toggle(id,on){ $(id).classList.toggle('show',!!on); }
+
+function hideAllScreens(){
+  ['#levelsPanel','#settingsPanel','#exitPanel','#resultPanel'].forEach(id=>toggle(id,false));
+  toggle('#title',false);
+  $('#toast').classList.remove('show');
+}
+
+function showTitle(){
+  state='title';
+  act=null; pending=null; endTimer=-1;
+  toastT=0;
+  hideAllScreens();
+  $('#hudBtns').classList.remove('show');
+  toggle('#title',true);
+  updateProgressHint();
+}
+
+function updateProgressHint(){
+  const all=PROGRESS.cleared>=LEVELS.length;
+  const base=all
+    ? '已通关全部 '+LEVELS.length+' 层 · 可以重玩'
+    : '进度 · 第 '+(PROGRESS.level+1)+' 层';
+  $('#progressHint').textContent=(PROGRESS.tut?'教学已完成 · ':'')+base;
+}
+
+function syncSettingsUI(){
+  $('#swSfx').setAttribute('aria-checked',String(!!SETTINGS.sfx));
+  $('#swReduce').setAttribute('aria-checked',String(!!SETTINGS.reduce));
+  Sfx.enabled=!!SETTINGS.sfx;
+  const v=clamp(SETTINGS.vol,0,100);
+  const el=$('#volSfx');
+  el.value=String(v);
+  el.style.setProperty('--p',v+'%');
+  $('#volPct').textContent=v+'%';
+  $('#volWrap').classList.toggle('off',!SETTINGS.sfx);
+  Sfx.setVol(volGain(v));
+}
+
+function resumeIndex(){
+  return PROGRESS.cleared>=LEVELS.length?0:clamp(PROGRESS.level,0,LEVELS.length-1);
+}
+
+/* ==================== 选关 ==================== */
+/* 已通关的层永远可以重玩；下一层（cleared 那一层）解锁；再往后锁住 */
+function renderLevelSelect(){
+  const grid=$('#levelGrid');
+  const done=Math.min(PROGRESS.cleared,LEVELS.length);
+  const cur=done>=LEVELS.length?-1:clamp(PROGRESS.level,0,LEVELS.length-1);
+  $('#lvDesc').textContent=done>=LEVELS.length
+    ? '已通关全部 '+LEVELS.length+' 层 · 点任意一层重玩'
+    : '已通关 '+done+' / '+LEVELS.length+' · 下一层是第 '+(done+1)+' 层';
+  grid.innerHTML='';
+  LEVELS.forEach((lv,i)=>{
+    const cleared=i<done;
+    const unlocked=i<=done;
+    const card=document.createElement('button');
+    card.type='button';
+    card.className='lv-card'+(cleared?' cleared':'')+(unlocked?'':' locked')+(i===cur?' current':'');
+    card.innerHTML='<b>'+R(i+1)+'</b><span>'+lv.place+'</span>';
+    card.setAttribute('aria-label','第 '+(i+1)+' 层 · '+lv.place+(unlocked?'':' · 未解锁'));
+    card.addEventListener('click',()=>{
+      if(!unlocked){
+        Sfx.resume(); Sfx.ui();
+        domToast('先通过第 '+(done+1)+' 层来解锁');
+        return;
+      }
+      Sfx.resume(); Sfx.ui();
+      if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+      toggle('#levelsPanel',false);
+      startLevel(i);
+    });
+    grid.appendChild(card);
+  });
+}
+
+function showLevelSelect(){
+  Sfx.resume(); Sfx.ui();
+  if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+  state='title';
+  act=null; pending=null; endTimer=-1;
+  toastT=0;
+  hideAllScreens();
+  $('#hudBtns').classList.remove('show');
+  renderLevelSelect();
+  toggle('#levelsPanel',true);
+  updateProgressHint();
+}
+
+/* ==================== 事件 ==================== */
+function beginGame(){
+  showLevelSelect();
+}
+function beginTutorial(){
+  Sfx.resume();
+  Sfx.ui();
+  if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+  startLevel('tut');
+}
+
+function bind(){
+  $('#btnStart').addEventListener('click',beginGame);
+  $('#btnTutorial').addEventListener('click',beginTutorial);
+
+  $('#btnSettings').addEventListener('click',()=>{
+    Sfx.resume(); Sfx.ui(); syncSettingsUI(); toggle('#settingsPanel',true);
+  });
+  $('#btnSettingsBack').addEventListener('click',()=>{
+    Sfx.ui(); toggle('#settingsPanel',false);
+  });
+  $('#btnExit').addEventListener('click',()=>{
+    Sfx.ui(); toggle('#exitPanel',true);
+  });
+  $('#btnExitNo').addEventListener('click',()=>{
+    Sfx.ui(); toggle('#exitPanel',false);
+  });
+  $('#btnExitYes').addEventListener('click',()=>{
+    Sfx.ui();
+    toggle('#exitPanel',false);
+    try{ window.close(); }catch(e){}
+    setTimeout(()=>{
+      if(document.visibilityState!=='hidden'){
+        showTitle();
+        toast('网页版无法关闭窗口，已回到首页');
+      }
+    },200);
+  });
+
+  const sw=(id,key)=>{
+    $(id).addEventListener('click',()=>{
+      SETTINGS[key]=!SETTINGS[key];
+      DB.set('settings',SETTINGS);
+      syncSettingsUI();
+      Sfx.resume();
+      if(SETTINGS.sfx) Sfx.ui();
+    });
+  };
+  sw('#swSfx','sfx'); sw('#swReduce','reduce');
+
+  const volEl=$('#volSfx');
+  volEl.addEventListener('input',()=>{
+    SETTINGS.vol=clamp(Math.round(Number(volEl.value)||0),0,100);
+    DB.set('settings',SETTINGS);
+    syncSettingsUI();
+  });
+  volEl.addEventListener('change',()=>{
+    Sfx.resume();
+    if(SETTINGS.sfx) Sfx.ui();
+  });
+
+  $('#btnReset').addEventListener('click',()=>{
+    PROGRESS={level:0,cleared:0,tut:false};
+    DB.set('progress',PROGRESS);
+    updateProgressHint();
+    Sfx.ui();
+    toast('进度已清除');
+  });
+
+  $('#btnBack').addEventListener('click',()=>{ Sfx.ui(); showTitle(); });
+  $('#btnRetry').addEventListener('click',()=>{ Sfx.ui(); restartLevel(); });
+  $('#btnLevelsBack').addEventListener('click',()=>{ Sfx.ui(); showTitle(); });
+
+  $('#rsNext').addEventListener('click',()=>{
+    Sfx.ui();
+    toggle('#resultPanel',false);
+    if(levelIndex<0){
+      /* 教学：三课依次播放，最后一课之后进第一层 */
+      const nxt=Math.max(0,tutStage)+1;
+      startLevel(nxt>=TUTORIALS.length?0:('tut'+nxt));
+      return;
+    }
+    startLevel(levelIndex+1<LEVELS.length?levelIndex+1:0);
+  });
+  $('#rsRetry').addEventListener('click',()=>{
+    Sfx.ui();
+    toggle('#resultPanel',false);
+    restartLevel();
+  });
+  $('#rsHome').addEventListener('click',()=>{ Sfx.ui(); showTitle(); });
+
+  const cv=$('#cv');
+  cv.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    const r=cv.getBoundingClientRect();
+    onTap(e.clientX-r.left,e.clientY-r.top);
+  },{passive:false});
+
+  window.addEventListener('resize',()=>{
+    clearTimeout(bind._t);
+    bind._t=setTimeout(()=>{ resize(); },120);
+  });
+  window.addEventListener('orientationchange',()=>{
+    setTimeout(resize,240);
+  });
+  /* 舞台尺寸变化（含移动端地址栏收放）时重新布局 */
+  if(window.ResizeObserver){
+    const ro=new ResizeObserver(()=>{
+      clearTimeout(ro._t);
+      ro._t=setTimeout(()=>{ resize(); },110);
+    });
+    ro.observe($('#stage'));
+  }
+  document.addEventListener('pointerdown',()=>Sfx.resume(),{passive:true});
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      if($('#levelsPanel').classList.contains('show')){ showTitle(); return; }
+      if(state==='play') showTitle();
+      return;
+    }
+    if(e.repeat) return;                       // 按住不连走，一次按键只走一格
+    const k=e.key.length===1?e.key.toLowerCase():e.key;
+    let dc=0,dr=0;
+    if(k==='w'||k==='ArrowUp') dr=-1;
+    else if(k==='s'||k==='ArrowDown') dr=1;
+    else if(k==='a'||k==='ArrowLeft') dc=-1;
+    else if(k==='d'||k==='ArrowRight') dc=1;
+    else return;
+    e.preventDefault();
+    Sfx.resume();
+    stepMove(dc,dr);
+  });
+}
+
+/* ==================== 启动 ==================== */
+function buildDust(){
+  const dust=$('#dust');
+  for(let i=0;i<20;i++){
+    const el=document.createElement('i');
+    el.style.left=(hash(i,21)*100).toFixed(2)+'%';
+    el.style.top=(40+hash(i,31)*60).toFixed(2)+'%';
+    el.style.animationDuration=(4+hash(i,41)*6).toFixed(2)+'s';
+    el.style.animationDelay=(-hash(i,51)*8).toFixed(2)+'s';
+    el.style.opacity=(0.2+hash(i,61)*0.6).toFixed(2);
+    dust.appendChild(el);
+  }
+}
+
+function frame(ts){
+  requestAnimationFrame(frame);
+  if(!lastT) lastT=ts;
+  let dt=(ts-lastT)/1000;
+  lastT=ts;
+  if(dt>0.06) dt=0.06;
+  if(dt<0) dt=0;
+  gtime=ts;
+  update(dt);
+  if(S) draw(ts);
+}
+
+function init(){
+  Sfx.init();                 // 提前建音频图并解码敲击取样（此时上下文还是 suspended，不会出声）
+  syncSettingsUI();
+  buildDust();
+  bind();
+  resize();
+  startLevel(resumeIndex());
+  showTitle();
+  requestAnimationFrame(frame);
+}
+
+init();
+})();
+</script>
+</body>
+</html>
