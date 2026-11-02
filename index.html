@@ -410,9 +410,9 @@ h1{
   <div class="screen panel" id="exitDone">
     <div class="panel-box">
       <h2>已退出游戏</h2>
-      <div class="desc">进度已经保存在这台设备上。这一页可以直接关掉；下次回来，从当前这一层继续。</div>
+      <div class="desc">进度已经保存在这台设备上。正在离开游戏页面；如果没有自动离开，直接关掉当前标签页即可。下次回来，从当前这一层继续。</div>
       <div class="panel-actions">
-        <button class="btn primary" id="btnExitHome">返回标题</button>
+        <button class="btn ghost" id="btnExitHome">取消退出</button>
       </div>
     </div>
   </div>
@@ -2042,8 +2042,8 @@ function bind(){
   $('#btnExitNo').addEventListener('click',()=>{
     Sfx.ui(); toggle('#exitPanel',false);
   });
-  /* 退出：先尽量真的关掉窗口（移动端浏览器通常只允许关闭脚本打开的窗口），
-     关不掉就停掉游戏并停在收尾屏，避免出现“点了没反应 / 又被弹回标题” */
+  /* 退出：手机浏览器一般不允许脚本关标签页，所以按
+     「直接关窗 → 离开本页」两步尽量真正退出；都做不到时停在收尾屏 */
   const closeWindow=()=>{
     try{ window.close(); }catch(e){}
     try{ if(navigator.app&&navigator.app.exitApp) navigator.app.exitApp(); }catch(e){}
@@ -2056,11 +2056,15 @@ function bind(){
     act=null; pending=null; endTimer=-1; toastT=0;
     hideAllScreens();
     $('#hudBtns').classList.remove('show');
-    toggle('#exitDone',true);
-    closeWindow();
-    /* 让退出的提示音放完再挂起音频；用户马上点「返回标题」的话取消挂起 */
-    clearTimeout(exitGame._t);
-    exitGame._t=setTimeout(()=>Sfx.suspend(),240);
+    toggle('#exitDone',true);              // 先给一屏“已退出”的反馈
+    closeWindow();                          // 1) 直接关窗
+    clearTimeout(exitGame._navT); clearTimeout(exitGame._sndT);
+    exitGame._sndT=setTimeout(()=>{ if(state==='exit') Sfx.suspend(); },240);
+    /* 2) 关不掉就把本页换成空白页，真正离开游戏（浏览器里关掉这个标签即可） */
+    exitGame._navT=setTimeout(()=>{
+      if(state!=='exit') return;
+      try{ location.replace('about:blank'); }catch(e){}
+    },1000);
   };
   $('#btnExitYes').addEventListener('click',()=>{
     Sfx.ui();
@@ -2068,7 +2072,7 @@ function bind(){
     exitGame();
   });
   $('#btnExitHome').addEventListener('click',()=>{
-    clearTimeout(exitGame._t);
+    clearTimeout(exitGame._navT); clearTimeout(exitGame._sndT);
     Sfx.resume(); Sfx.ui();
     toggle('#exitDone',false);
     showTitle();
