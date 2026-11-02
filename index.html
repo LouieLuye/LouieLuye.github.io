@@ -210,6 +210,11 @@ h1{
 .actions-row{display:flex;gap:10px}
 .actions-row .btn{flex:1}
 
+/* ---------- 退出收尾屏 ---------- */
+#exitDone{background:radial-gradient(120% 80% at 50% 0%,rgba(18,21,31,.97),rgba(4,5,9,.99) 70%)}
+#exitDone .panel-box{text-align:center}
+#exitDone .panel-box .desc{margin-top:10px}
+
 /* ---------- 选关 ---------- */
 .panel-box.wide{max-width:400px}
 .lv-grid{
@@ -401,6 +406,17 @@ h1{
     </div>
   </div>
 
+  <!-- 退出收尾：移动端浏览器不允许网页自己关闭标签页，用这一屏代替「退出后卡住/什么都没发生」 -->
+  <div class="screen panel" id="exitDone">
+    <div class="panel-box">
+      <h2>已退出游戏</h2>
+      <div class="desc">进度已经保存在这台设备上。这一页可以直接关掉；下次回来，从当前这一层继续。</div>
+      <div class="panel-actions">
+        <button class="btn primary" id="btnExitHome">返回标题</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 </div>
 <script>
@@ -482,6 +498,10 @@ const Sfx={
   resume(){
     this.init();
     if(this.ac&&this.ac.state==='suspended') this.ac.resume().catch(()=>{});
+  },
+  /* 退出时把音频挂起，回到标题后由 pointerdown / resume() 自动恢复 */
+  suspend(){
+    try{ if(this.ac&&this.ac.state==='running') this.ac.suspend(); }catch(e){}
   },
   tone(f,dur,o){
     if(!this.enabled||!this.ac) return;
@@ -1909,7 +1929,7 @@ function showResult(win){
 function toggle(id,on){ $(id).classList.toggle('show',!!on); }
 
 function hideAllScreens(){
-  ['#levelsPanel','#settingsPanel','#exitPanel','#resultPanel'].forEach(id=>toggle(id,false));
+  ['#levelsPanel','#settingsPanel','#exitPanel','#resultPanel','#exitDone'].forEach(id=>toggle(id,false));
   toggle('#title',false);
   $('#toast').classList.remove('show');
 }
@@ -2022,17 +2042,42 @@ function bind(){
   $('#btnExitNo').addEventListener('click',()=>{
     Sfx.ui(); toggle('#exitPanel',false);
   });
+  /* 退出：先尽量真的关掉窗口（移动端浏览器通常只允许关闭脚本打开的窗口），
+     关不掉就停掉游戏并停在收尾屏，避免出现“点了没反应 / 又被弹回标题” */
+  const closeWindow=()=>{
+    try{ window.close(); }catch(e){}
+    try{ if(navigator.app&&navigator.app.exitApp) navigator.app.exitApp(); }catch(e){}
+    try{ if(window.opener){ window.opener=null; window.close(); } }catch(e){}
+    try{ if(window.top&&window.top!==window) window.top.close(); }catch(e){}
+  };
+  const exitGame=()=>{
+    DB.set('progress',PROGRESS);
+    state='exit';
+    act=null; pending=null; endTimer=-1; toastT=0;
+    hideAllScreens();
+    $('#hudBtns').classList.remove('show');
+    toggle('#exitDone',true);
+    closeWindow();
+    /* 让退出的提示音放完再挂起音频；用户马上点「返回标题」的话取消挂起 */
+    clearTimeout(exitGame._t);
+    exitGame._t=setTimeout(()=>Sfx.suspend(),240);
+  };
   $('#btnExitYes').addEventListener('click',()=>{
     Sfx.ui();
     toggle('#exitPanel',false);
-    try{ window.close(); }catch(e){}
-    setTimeout(()=>{
-      if(document.visibilityState!=='hidden'){
-        showTitle();
-        toast('网页版无法关闭窗口，已回到首页');
-      }
-    },200);
+    exitGame();
   });
+  $('#btnExitHome').addEventListener('click',()=>{
+    clearTimeout(exitGame._t);
+    Sfx.resume(); Sfx.ui();
+    toggle('#exitDone',false);
+    showTitle();
+  });
+  /* 窗口关不掉时，切到后台再回来就当作重新进入游戏 */
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'&&state==='exit') showTitle();
+  });
+  window.addEventListener('pageshow',()=>{ if(state==='exit') showTitle(); });
 
   const sw=(id,key)=>{
     $(id).addEventListener('click',()=>{
@@ -2108,9 +2153,10 @@ function bind(){
     });
     ro.observe($('#stage'));
   }
-  document.addEventListener('pointerdown',()=>Sfx.resume(),{passive:true});
+  document.addEventListener('pointerdown',()=>{ if(state!=='exit') Sfx.resume(); },{passive:true});
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
+      if(state==='exit'){ toggle('#exitDone',false); showTitle(); return; }
       if($('#levelsPanel').classList.contains('show')){ showTitle(); return; }
       if(state==='play') showTitle();
       return;
